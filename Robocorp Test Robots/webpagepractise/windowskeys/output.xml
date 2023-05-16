@@ -1,0 +1,611 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 5.0.1 (Python 3.9.13 on win32)" generated="20230327 13:05:36.998" rpa="true" schemaversion="3">
+<suite id="s1" name="Calculator" source="C:\Users\sigb\Desktop\RPA\sample projects\webpagepractise\windowskeys\calculator.robot">
+<test id="s1-t1" name="Open calculator and Write Data" line="8">
+<kw name="Open calculator" library="calculatorkey">
+<kw name="Open Executable" library="RPA.Desktop.Windows">
+<arg>${url}</arg>
+<arg>${title}</arg>
+<doc>Open Windows executable. Window title name is required
+to get handle on the application.</doc>
+<msg timestamp="20230327 13:05:37.993" level="INFO">Opening executable: calc.exe - window: Calculator</msg>
+<msg timestamp="20230327 13:05:38.005" level="INFO">Open dialog: 'Calculator'</msg>
+<msg timestamp="20230327 13:05:38.707" level="INFO">Connect to application handle: 3802532</msg>
+<status status="PASS" starttime="20230327 13:05:37.992" endtime="20230327 13:05:39.033"/>
+</kw>
+<status status="PASS" starttime="20230327 13:05:37.992" endtime="20230327 13:05:39.033"/>
+</kw>
+<kw name="ADDITION" library="calculatorkey">
+<arg>44</arg>
+<arg>98</arg>
+<kw name="Split String To Characters" library="String">
+<var>${first_char}</var>
+<arg>${first}</arg>
+<doc>Splits the given ``string`` to characters.</doc>
+<msg timestamp="20230327 13:05:39.034" level="INFO">${first_char} = ['4', '4']</msg>
+<status status="PASS" starttime="20230327 13:05:39.033" endtime="20230327 13:05:39.034"/>
+</kw>
+<for flavor="IN">
+<var>${i}</var>
+<value>@{first_char}</value>
+<iter>
+<var name="${i}">4</var>
+<kw name="Mouse Click" library="RPA.Desktop.Windows">
+<arg>id:num${i}Button</arg>
+<doc>Mouse click `locator`, `coordinates`, or `image`</doc>
+<msg timestamp="20230327 13:05:39.034" level="INFO">Mouse click: id:num4Button</msg>
+<msg timestamp="20230327 13:05:39.035" level="INFO">Click type 'click' at (97, 576)</msg>
+<status status="PASS" starttime="20230327 13:05:39.034" endtime="20230327 13:05:39.158"/>
+</kw>
+<status status="PASS" starttime="20230327 13:05:39.034" endtime="20230327 13:05:39.158"/>
+</iter>
+<iter>
+<var name="${i}">4</var>
+<kw name="Mouse Click" library="RPA.Desktop.Windows">
+<arg>id:num${i}Button</arg>
+<doc>Mouse click `locator`, `coordinates`, or `image`</doc>
+<msg timestamp="20230327 13:05:39.158" level="INFO">Mouse click: id:num4Button</msg>
+<msg timestamp="20230327 13:05:39.158" level="INFO">Click type 'click' at (97, 576)</msg>
+<status status="PASS" starttime="20230327 13:05:39.158" endtime="20230327 13:05:39.750"/>
+</kw>
+<status status="PASS" starttime="20230327 13:05:39.158" endtime="20230327 13:05:39.750"/>
+</iter>
+<status status="PASS" starttime="20230327 13:05:39.034" endtime="20230327 13:05:39.750"/>
+</for>
+<kw name="Sleep" library="BuiltIn">
+<arg>1</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20230327 13:05:40.754" level="INFO">Slept 1 second</msg>
+<status status="PASS" starttime="20230327 13:05:39.750" endtime="20230327 13:05:40.755"/>
+</kw>
+<kw name="Mouse Click" library="RPA.Desktop.Windows">
+<arg>id:plusButton</arg>
+<doc>Mouse click `locator`, `coordinates`, or `image`</doc>
+<msg timestamp="20230327 13:05:40.756" level="INFO">Mouse click: id:plusButton</msg>
+<msg timestamp="20230327 13:05:40.756" level="INFO">Click type 'click' at (333, 629)</msg>
+<status status="PASS" starttime="20230327 13:05:40.755" endtime="20230327 13:05:40.876"/>
+</kw>
+<kw name="Split String To Characters" library="String">
+<var>${second_char}</var>
+<arg>${second}</arg>
+<doc>Splits the given ``string`` to characters.</doc>
+<msg timestamp="20230327 13:05:40.877" level="INFO">${second_char} = ['9', '8']</msg>
+<status status="PASS" starttime="20230327 13:05:40.876" endtime="20230327 13:05:40.877"/>
+</kw>
+<for flavor="IN">
+<var>${i}</var>
+<value>@{second_char}</value>
+<iter>
+<var name="${i}">9</var>
+<kw name="Mouse Click" library="RPA.Desktop.Windows">
+<arg>id:num${i}Button</arg>
+<doc>Mouse click `locator`, `coordinates`, or `image`</doc>
+<msg timestamp="20230327 13:05:40.878" level="INFO">Mouse click: id:num9Button</msg>
+<msg timestamp="20230327 13:05:40.878" level="INFO">Click type 'click' at (255, 523)</msg>
+<status status="PASS" starttime="20230327 13:05:40.877" endtime="20230327 13:05:41.456"/>
+</kw>
+<status status="PASS" starttime="20230327 13:05:40.877" endtime="20230327 13:05:41.456"/>
+</iter>
+<iter>
+<var name="${i}">8</var>
+<kw name="Mouse Click" library="RPA.Desktop.Windows">
+<arg>id:num${i}Button</arg>
+<doc>Mouse click `locator`, `coordinates`, or `image`</doc>
+<msg timestamp="20230327 13:05:41.457" level="INFO">Mouse click: id:num8Button</msg>
+<msg timestamp="20230327 13:05:41.458" level="INFO">Click type 'click' at (176, 523)</msg>
+<status status="PASS" starttime="20230327 13:05:41.457" endtime="20230327 13:05:42.033"/>
+</kw>
+<status status="PASS" starttime="20230327 13:05:41.456" endtime="20230327 13:05:42.033"/>
+</iter>
+<status status="PASS" starttime="20230327 13:05:40.877" endtime="20230327 13:05:42.033"/>
+</for>
+<kw name="Sleep" library="BuiltIn">
+<arg>1</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20230327 13:05:43.046" level="INFO">Slept 1 second</msg>
+<status status="PASS" starttime="20230327 13:05:42.033" endtime="20230327 13:05:43.046"/>
+</kw>
+<kw name="Mouse Click" library="RPA.Desktop.Windows">
+<arg>id:equalButton</arg>
+<doc>Mouse click `locator`, `coordinates`, or `image`</doc>
+<msg timestamp="20230327 13:05:43.048" level="INFO">Mouse click: id:equalButton</msg>
+<msg timestamp="20230327 13:05:43.049" level="INFO">Click type 'click' at (333, 682)</msg>
+<status status="PASS" starttime="20230327 13:05:43.047" endtime="20230327 13:05:43.184"/>
+</kw>
+<kw name="Get Text" library="RPA.Desktop.Windows">
+<var>${result}</var>
+<arg>id:CalculatorResults</arg>
+<doc>Get text from element</doc>
+<msg timestamp="20230327 13:05:43.190" level="INFO">${result} = {'value': None, 'children_texts': '', 'rich_text': 'Display is 0', 'legacy_value': '', 'legacy_name': 'Display is 142'}</msg>
+<status status="PASS" starttime="20230327 13:05:43.184" endtime="20230327 13:05:43.190"/>
+</kw>
+<kw name="Get From Dictionary" library="Collections">
+<var>${my_value}</var>
+<arg>${result}</arg>
+<arg>legacy_name</arg>
+<doc>Returns a value from the given ``dictionary`` based on the given ``key``.</doc>
+<msg timestamp="20230327 13:05:43.191" level="INFO">${my_value} = Display is 142</msg>
+<status status="PASS" starttime="20230327 13:05:43.190" endtime="20230327 13:05:43.191"/>
+</kw>
+<kw name="Log To Console" library="BuiltIn">
+<arg>"addition value ${my_value} "</arg>
+<doc>Logs the given message to the console.</doc>
+<status status="PASS" starttime="20230327 13:05:43.191" endtime="20230327 13:05:43.191"/>
+</kw>
+<kw name="Sleep" library="BuiltIn">
+<arg>2</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20230327 13:05:45.195" level="INFO">Slept 2 seconds</msg>
+<status status="PASS" starttime="20230327 13:05:43.191" endtime="20230327 13:05:45.195"/>
+</kw>
+<kw name="Mouse Click" library="RPA.Desktop.Windows">
+<arg>id:clearButton</arg>
+<doc>Mouse click `locator`, `coordinates`, or `image`</doc>
+<msg timestamp="20230327 13:05:45.196" level="INFO">Mouse click: id:clearButton</msg>
+<msg timestamp="20230327 13:05:45.196" level="INFO">Click type 'click' at (254, 417)</msg>
+<status status="PASS" starttime="20230327 13:05:45.196" endtime="20230327 13:05:45.304"/>
+</kw>
+<status status="PASS" starttime="20230327 13:05:39.033" endtime="20230327 13:05:45.304"/>
+</kw>
+<kw name="SUBTRACTION" library="calculatorkey">
+<arg>69</arg>
+<arg>69</arg>
+<kw name="Split String To Characters" library="String">
+<var>${first_char}</var>
+<arg>${first}</arg>
+<doc>Splits the given ``string`` to characters.</doc>
+<msg timestamp="20230327 13:05:45.307" level="INFO">${first_char} = ['6', '9']</msg>
+<status status="PASS" starttime="20230327 13:05:45.306" endtime="20230327 13:05:45.307"/>
+</kw>
+<for flavor="IN">
+<var>${i}</var>
+<value>@{first_char}</value>
+<iter>
+<var name="${i}">6</var>
+<kw name="Mouse Click" library="RPA.Desktop.Windows">
+<arg>id:num${i}Button</arg>
+<doc>Mouse click `locator`, `coordinates`, or `image`</doc>
+<msg timestamp="20230327 13:05:45.308" level="INFO">Mouse click: id:num6Button</msg>
+<msg timestamp="20230327 13:05:45.308" level="INFO">Click type 'click' at (255, 576)</msg>
+<status status="PASS" starttime="20230327 13:05:45.307" endtime="20230327 13:05:45.903"/>
+</kw>
+<status status="PASS" starttime="20230327 13:05:45.307" endtime="20230327 13:05:45.903"/>
+</iter>
+<iter>
+<var name="${i}">9</var>
+<kw name="Mouse Click" library="RPA.Desktop.Windows">
+<arg>id:num${i}Button</arg>
+<doc>Mouse click `locator`, `coordinates`, or `image`</doc>
+<msg timestamp="20230327 13:05:45.906" level="INFO">Mouse click: id:num9Button</msg>
+<msg timestamp="20230327 13:05:45.906" level="INFO">Click type 'click' at (255, 523)</msg>
+<status status="PASS" starttime="20230327 13:05:45.904" endtime="20230327 13:05:46.499"/>
+</kw>
+<status status="PASS" starttime="20230327 13:05:45.903" endtime="20230327 13:05:46.499"/>
+</iter>
+<status status="PASS" starttime="20230327 13:05:45.307" endtime="20230327 13:05:46.499"/>
+</for>
+<kw name="Sleep" library="BuiltIn">
+<arg>1</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20230327 13:05:47.502" level="INFO">Slept 1 second</msg>
+<status status="PASS" starttime="20230327 13:05:46.500" endtime="20230327 13:05:47.502"/>
+</kw>
+<kw name="Mouse Click" library="RPA.Desktop.Windows">
+<arg>id:minusButton</arg>
+<doc>Mouse click `locator`, `coordinates`, or `image`</doc>
+<msg timestamp="20230327 13:05:47.503" level="INFO">Mouse click: id:minusButton</msg>
+<msg timestamp="20230327 13:05:47.503" level="INFO">Click type 'click' at (333, 576)</msg>
+<status status="PASS" starttime="20230327 13:05:47.502" endtime="20230327 13:05:47.612"/>
+</kw>
+<kw name="Split String To Characters" library="String">
+<var>${second_char}</var>
+<arg>${second}</arg>
+<doc>Splits the given ``string`` to characters.</doc>
+<msg timestamp="20230327 13:05:47.613" level="INFO">${second_char} = ['6', '9']</msg>
+<status status="PASS" starttime="20230327 13:05:47.612" endtime="20230327 13:05:47.613"/>
+</kw>
+<for flavor="IN">
+<var>${i}</var>
+<value>@{second_char}</value>
+<iter>
+<var name="${i}">6</var>
+<kw name="Mouse Click" library="RPA.Desktop.Windows">
+<arg>id:num${i}Button</arg>
+<doc>Mouse click `locator`, `coordinates`, or `image`</doc>
+<msg timestamp="20230327 13:05:47.614" level="INFO">Mouse click: id:num6Button</msg>
+<msg timestamp="20230327 13:05:47.615" level="INFO">Click type 'click' at (255, 576)</msg>
+<status status="PASS" starttime="20230327 13:05:47.614" endtime="20230327 13:05:48.192"/>
+</kw>
+<status status="PASS" starttime="20230327 13:05:47.614" endtime="20230327 13:05:48.192"/>
+</iter>
+<iter>
+<var name="${i}">9</var>
+<kw name="Mouse Click" library="RPA.Desktop.Windows">
+<arg>id:num${i}Button</arg>
+<doc>Mouse click `locator`, `coordinates`, or `image`</doc>
+<msg timestamp="20230327 13:05:48.194" level="INFO">Mouse click: id:num9Button</msg>
+<msg timestamp="20230327 13:05:48.194" level="INFO">Click type 'click' at (255, 523)</msg>
+<status status="PASS" starttime="20230327 13:05:48.193" endtime="20230327 13:05:48.786"/>
+</kw>
+<status status="PASS" starttime="20230327 13:05:48.192" endtime="20230327 13:05:48.786"/>
+</iter>
+<status status="PASS" starttime="20230327 13:05:47.613" endtime="20230327 13:05:48.786"/>
+</for>
+<kw name="Sleep" library="BuiltIn">
+<arg>1</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20230327 13:05:49.792" level="INFO">Slept 1 second</msg>
+<status status="PASS" starttime="20230327 13:05:48.787" endtime="20230327 13:05:49.792"/>
+</kw>
+<kw name="Mouse Click" library="RPA.Desktop.Windows">
+<arg>id:equalButton</arg>
+<doc>Mouse click `locator`, `coordinates`, or `image`</doc>
+<msg timestamp="20230327 13:05:49.793" level="INFO">Mouse click: id:equalButton</msg>
+<msg timestamp="20230327 13:05:49.793" level="INFO">Click type 'click' at (333, 682)</msg>
+<status status="PASS" starttime="20230327 13:05:49.793" endtime="20230327 13:05:49.901"/>
+</kw>
+<kw name="Get Text" library="RPA.Desktop.Windows">
+<var>${result}</var>
+<arg>id:CalculatorResults</arg>
+<doc>Get text from element</doc>
+<msg timestamp="20230327 13:05:49.908" level="INFO">${result} = {'value': None, 'children_texts': '', 'rich_text': 'Display is 0', 'legacy_value': '', 'legacy_name': 'Display is 0'}</msg>
+<status status="PASS" starttime="20230327 13:05:49.902" endtime="20230327 13:05:49.908"/>
+</kw>
+<kw name="Get From Dictionary" library="Collections">
+<var>${my_value}</var>
+<arg>${result}</arg>
+<arg>legacy_name</arg>
+<doc>Returns a value from the given ``dictionary`` based on the given ``key``.</doc>
+<msg timestamp="20230327 13:05:49.909" level="INFO">${my_value} = Display is 0</msg>
+<status status="PASS" starttime="20230327 13:05:49.908" endtime="20230327 13:05:49.909"/>
+</kw>
+<kw name="Log To Console" library="BuiltIn">
+<arg>"subtraction value ${my_value}"</arg>
+<doc>Logs the given message to the console.</doc>
+<status status="PASS" starttime="20230327 13:05:49.909" endtime="20230327 13:05:49.909"/>
+</kw>
+<kw name="Sleep" library="BuiltIn">
+<arg>2</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20230327 13:05:51.922" level="INFO">Slept 2 seconds</msg>
+<status status="PASS" starttime="20230327 13:05:49.910" endtime="20230327 13:05:51.922"/>
+</kw>
+<kw name="Mouse Click" library="RPA.Desktop.Windows">
+<arg>id:clearButton</arg>
+<doc>Mouse click `locator`, `coordinates`, or `image`</doc>
+<msg timestamp="20230327 13:05:51.924" level="INFO">Mouse click: id:clearButton</msg>
+<msg timestamp="20230327 13:05:51.925" level="INFO">Click type 'click' at (254, 417)</msg>
+<status status="PASS" starttime="20230327 13:05:51.924" endtime="20230327 13:05:52.032"/>
+</kw>
+<status status="PASS" starttime="20230327 13:05:45.305" endtime="20230327 13:05:52.032"/>
+</kw>
+<kw name="SQUARE" library="calculatorkey">
+<arg>69</arg>
+<kw name="Split String To Characters" library="String">
+<var>${first_char}</var>
+<arg>${first}</arg>
+<doc>Splits the given ``string`` to characters.</doc>
+<msg timestamp="20230327 13:05:52.034" level="INFO">${first_char} = ['6', '9']</msg>
+<status status="PASS" starttime="20230327 13:05:52.034" endtime="20230327 13:05:52.034"/>
+</kw>
+<for flavor="IN">
+<var>${i}</var>
+<value>@{first_char}</value>
+<iter>
+<var name="${i}">6</var>
+<kw name="Mouse Click" library="RPA.Desktop.Windows">
+<arg>id:num${i}Button</arg>
+<doc>Mouse click `locator`, `coordinates`, or `image`</doc>
+<msg timestamp="20230327 13:05:52.035" level="INFO">Mouse click: id:num6Button</msg>
+<msg timestamp="20230327 13:05:52.035" level="INFO">Click type 'click' at (255, 576)</msg>
+<status status="PASS" starttime="20230327 13:05:52.035" endtime="20230327 13:05:52.608"/>
+</kw>
+<status status="PASS" starttime="20230327 13:05:52.034" endtime="20230327 13:05:52.608"/>
+</iter>
+<iter>
+<var name="${i}">9</var>
+<kw name="Mouse Click" library="RPA.Desktop.Windows">
+<arg>id:num${i}Button</arg>
+<doc>Mouse click `locator`, `coordinates`, or `image`</doc>
+<msg timestamp="20230327 13:05:52.610" level="INFO">Mouse click: id:num9Button</msg>
+<msg timestamp="20230327 13:05:52.611" level="INFO">Click type 'click' at (255, 523)</msg>
+<status status="PASS" starttime="20230327 13:05:52.609" endtime="20230327 13:05:53.200"/>
+</kw>
+<status status="PASS" starttime="20230327 13:05:52.608" endtime="20230327 13:05:53.200"/>
+</iter>
+<status status="PASS" starttime="20230327 13:05:52.034" endtime="20230327 13:05:53.200"/>
+</for>
+<kw name="Sleep" library="BuiltIn">
+<arg>1</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20230327 13:05:54.207" level="INFO">Slept 1 second</msg>
+<status status="PASS" starttime="20230327 13:05:53.201" endtime="20230327 13:05:54.207"/>
+</kw>
+<kw name="Mouse Click" library="RPA.Desktop.Windows">
+<arg>id:xpower2Button</arg>
+<doc>Mouse click `locator`, `coordinates`, or `image`</doc>
+<msg timestamp="20230327 13:05:54.208" level="INFO">Mouse click: id:xpower2Button</msg>
+<msg timestamp="20230327 13:05:54.208" level="INFO">Click type 'click' at (176, 470)</msg>
+<status status="PASS" starttime="20230327 13:05:54.207" endtime="20230327 13:05:54.317"/>
+</kw>
+<kw name="Get Text" library="RPA.Desktop.Windows">
+<var>${result}</var>
+<arg>id:CalculatorResults</arg>
+<doc>Get text from element</doc>
+<msg timestamp="20230327 13:05:54.325" level="INFO">${result} = {'value': None, 'children_texts': '', 'rich_text': 'Display is 0', 'legacy_value': '', 'legacy_name': 'Display is 4,761'}</msg>
+<status status="PASS" starttime="20230327 13:05:54.318" endtime="20230327 13:05:54.325"/>
+</kw>
+<kw name="Get From Dictionary" library="Collections">
+<var>${my_value}</var>
+<arg>${result}</arg>
+<arg>legacy_name</arg>
+<doc>Returns a value from the given ``dictionary`` based on the given ``key``.</doc>
+<msg timestamp="20230327 13:05:54.326" level="INFO">${my_value} = Display is 4,761</msg>
+<status status="PASS" starttime="20230327 13:05:54.325" endtime="20230327 13:05:54.326"/>
+</kw>
+<kw name="Log To Console" library="BuiltIn">
+<arg>"square value ${my_value}"</arg>
+<doc>Logs the given message to the console.</doc>
+<status status="PASS" starttime="20230327 13:05:54.326" endtime="20230327 13:05:54.326"/>
+</kw>
+<kw name="Sleep" library="BuiltIn">
+<arg>2</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20230327 13:05:56.341" level="INFO">Slept 2 seconds</msg>
+<status status="PASS" starttime="20230327 13:05:54.326" endtime="20230327 13:05:56.342"/>
+</kw>
+<kw name="Mouse Click" library="RPA.Desktop.Windows">
+<arg>id:clearButton</arg>
+<doc>Mouse click `locator`, `coordinates`, or `image`</doc>
+<msg timestamp="20230327 13:05:56.344" level="INFO">Mouse click: id:clearButton</msg>
+<msg timestamp="20230327 13:05:56.344" level="INFO">Click type 'click' at (254, 417)</msg>
+<status status="PASS" starttime="20230327 13:05:56.343" endtime="20230327 13:05:56.449"/>
+</kw>
+<status status="PASS" starttime="20230327 13:05:52.033" endtime="20230327 13:05:56.449"/>
+</kw>
+<kw name="FRACTION" library="calculatorkey">
+<arg>3</arg>
+<kw name="Split String To Characters" library="String">
+<var>${first_char}</var>
+<arg>${first}</arg>
+<doc>Splits the given ``string`` to characters.</doc>
+<msg timestamp="20230327 13:05:56.452" level="INFO">${first_char} = ['3']</msg>
+<status status="PASS" starttime="20230327 13:05:56.452" endtime="20230327 13:05:56.452"/>
+</kw>
+<for flavor="IN">
+<var>${i}</var>
+<value>@{first_char}</value>
+<iter>
+<var name="${i}">3</var>
+<kw name="Mouse Click" library="RPA.Desktop.Windows">
+<arg>id:num${i}Button</arg>
+<doc>Mouse click `locator`, `coordinates`, or `image`</doc>
+<msg timestamp="20230327 13:05:56.453" level="INFO">Mouse click: id:num3Button</msg>
+<msg timestamp="20230327 13:05:56.454" level="INFO">Click type 'click' at (255, 629)</msg>
+<status status="PASS" starttime="20230327 13:05:56.453" endtime="20230327 13:05:57.045"/>
+</kw>
+<status status="PASS" starttime="20230327 13:05:56.453" endtime="20230327 13:05:57.045"/>
+</iter>
+<status status="PASS" starttime="20230327 13:05:56.453" endtime="20230327 13:05:57.045"/>
+</for>
+<kw name="Sleep" library="BuiltIn">
+<arg>1</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20230327 13:05:58.049" level="INFO">Slept 1 second</msg>
+<status status="PASS" starttime="20230327 13:05:57.046" endtime="20230327 13:05:58.049"/>
+</kw>
+<kw name="Mouse Click" library="RPA.Desktop.Windows">
+<arg>id:invertButton</arg>
+<doc>Mouse click `locator`, `coordinates`, or `image`</doc>
+<msg timestamp="20230327 13:05:58.050" level="INFO">Mouse click: id:invertButton</msg>
+<msg timestamp="20230327 13:05:58.050" level="INFO">Click type 'click' at (97, 470)</msg>
+<status status="PASS" starttime="20230327 13:05:58.049" endtime="20230327 13:05:58.158"/>
+</kw>
+<kw name="Get Text" library="RPA.Desktop.Windows">
+<var>${result}</var>
+<arg>id:CalculatorResults</arg>
+<doc>Get text from element</doc>
+<msg timestamp="20230327 13:05:58.166" level="INFO">${result} = {'value': None, 'children_texts': '', 'rich_text': 'Display is 0', 'legacy_value': '', 'legacy_name': 'Display is 0.3333333333333333'}</msg>
+<status status="PASS" starttime="20230327 13:05:58.158" endtime="20230327 13:05:58.166"/>
+</kw>
+<kw name="Get From Dictionary" library="Collections">
+<var>${my_value}</var>
+<arg>${result}</arg>
+<arg>legacy_name</arg>
+<doc>Returns a value from the given ``dictionary`` based on the given ``key``.</doc>
+<msg timestamp="20230327 13:05:58.167" level="INFO">${my_value} = Display is 0.3333333333333333</msg>
+<status status="PASS" starttime="20230327 13:05:58.166" endtime="20230327 13:05:58.167"/>
+</kw>
+<kw name="Log To Console" library="BuiltIn">
+<arg>"fraction value ${my_value}"</arg>
+<doc>Logs the given message to the console.</doc>
+<status status="PASS" starttime="20230327 13:05:58.167" endtime="20230327 13:05:58.168"/>
+</kw>
+<kw name="Sleep" library="BuiltIn">
+<arg>2</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20230327 13:06:00.176" level="INFO">Slept 2 seconds</msg>
+<status status="PASS" starttime="20230327 13:05:58.168" endtime="20230327 13:06:00.176"/>
+</kw>
+<kw name="Mouse Click" library="RPA.Desktop.Windows">
+<arg>id:clearButton</arg>
+<doc>Mouse click `locator`, `coordinates`, or `image`</doc>
+<msg timestamp="20230327 13:06:00.177" level="INFO">Mouse click: id:clearButton</msg>
+<msg timestamp="20230327 13:06:00.177" level="INFO">Click type 'click' at (254, 417)</msg>
+<status status="PASS" starttime="20230327 13:06:00.176" endtime="20230327 13:06:00.287"/>
+</kw>
+<status status="PASS" starttime="20230327 13:05:56.451" endtime="20230327 13:06:00.287"/>
+</kw>
+<kw name="MULTIPLICATION" library="calculatorkey">
+<arg>10</arg>
+<arg>400</arg>
+<kw name="Split String To Characters" library="String">
+<var>${first_char}</var>
+<arg>${first}</arg>
+<doc>Splits the given ``string`` to characters.</doc>
+<msg timestamp="20230327 13:06:00.291" level="INFO">${first_char} = ['1', '0']</msg>
+<status status="PASS" starttime="20230327 13:06:00.290" endtime="20230327 13:06:00.291"/>
+</kw>
+<for flavor="IN">
+<var>${i}</var>
+<value>@{first_char}</value>
+<iter>
+<var name="${i}">1</var>
+<kw name="Mouse Click" library="RPA.Desktop.Windows">
+<arg>id:num${i}Button</arg>
+<doc>Mouse click `locator`, `coordinates`, or `image`</doc>
+<msg timestamp="20230327 13:06:00.292" level="INFO">Mouse click: id:num1Button</msg>
+<msg timestamp="20230327 13:06:00.292" level="INFO">Click type 'click' at (97, 629)</msg>
+<status status="PASS" starttime="20230327 13:06:00.291" endtime="20230327 13:06:00.870"/>
+</kw>
+<status status="PASS" starttime="20230327 13:06:00.291" endtime="20230327 13:06:00.870"/>
+</iter>
+<iter>
+<var name="${i}">0</var>
+<kw name="Mouse Click" library="RPA.Desktop.Windows">
+<arg>id:num${i}Button</arg>
+<doc>Mouse click `locator`, `coordinates`, or `image`</doc>
+<msg timestamp="20230327 13:06:00.871" level="INFO">Mouse click: id:num0Button</msg>
+<msg timestamp="20230327 13:06:00.871" level="INFO">Click type 'click' at (176, 682)</msg>
+<status status="PASS" starttime="20230327 13:06:00.870" endtime="20230327 13:06:00.981"/>
+</kw>
+<status status="PASS" starttime="20230327 13:06:00.870" endtime="20230327 13:06:00.981"/>
+</iter>
+<status status="PASS" starttime="20230327 13:06:00.291" endtime="20230327 13:06:00.981"/>
+</for>
+<kw name="Sleep" library="BuiltIn">
+<arg>1</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20230327 13:06:01.984" level="INFO">Slept 1 second</msg>
+<status status="PASS" starttime="20230327 13:06:00.981" endtime="20230327 13:06:01.984"/>
+</kw>
+<kw name="Mouse Click" library="RPA.Desktop.Windows">
+<arg>id:multiplyButton</arg>
+<doc>Mouse click `locator`, `coordinates`, or `image`</doc>
+<msg timestamp="20230327 13:06:01.985" level="INFO">Mouse click: id:multiplyButton</msg>
+<msg timestamp="20230327 13:06:01.985" level="INFO">Click type 'click' at (333, 523)</msg>
+<status status="PASS" starttime="20230327 13:06:01.984" endtime="20230327 13:06:02.200"/>
+</kw>
+<kw name="Split String To Characters" library="String">
+<var>${second_char}</var>
+<arg>${second}</arg>
+<doc>Splits the given ``string`` to characters.</doc>
+<msg timestamp="20230327 13:06:02.200" level="INFO">${second_char} = ['4', '0', '0']</msg>
+<status status="PASS" starttime="20230327 13:06:02.200" endtime="20230327 13:06:02.200"/>
+</kw>
+<for flavor="IN">
+<var>${i}</var>
+<value>@{second_char}</value>
+<iter>
+<var name="${i}">4</var>
+<kw name="Mouse Click" library="RPA.Desktop.Windows">
+<arg>id:num${i}Button</arg>
+<doc>Mouse click `locator`, `coordinates`, or `image`</doc>
+<msg timestamp="20230327 13:06:02.201" level="INFO">Mouse click: id:num4Button</msg>
+<msg timestamp="20230327 13:06:02.201" level="INFO">Click type 'click' at (97, 576)</msg>
+<status status="PASS" starttime="20230327 13:06:02.201" endtime="20230327 13:06:02.355"/>
+</kw>
+<status status="PASS" starttime="20230327 13:06:02.201" endtime="20230327 13:06:02.355"/>
+</iter>
+<iter>
+<var name="${i}">0</var>
+<kw name="Mouse Click" library="RPA.Desktop.Windows">
+<arg>id:num${i}Button</arg>
+<doc>Mouse click `locator`, `coordinates`, or `image`</doc>
+<msg timestamp="20230327 13:06:02.357" level="INFO">Mouse click: id:num0Button</msg>
+<msg timestamp="20230327 13:06:02.357" level="INFO">Click type 'click' at (176, 682)</msg>
+<status status="PASS" starttime="20230327 13:06:02.356" endtime="20230327 13:06:02.480"/>
+</kw>
+<status status="PASS" starttime="20230327 13:06:02.355" endtime="20230327 13:06:02.480"/>
+</iter>
+<iter>
+<var name="${i}">0</var>
+<kw name="Mouse Click" library="RPA.Desktop.Windows">
+<arg>id:num${i}Button</arg>
+<doc>Mouse click `locator`, `coordinates`, or `image`</doc>
+<msg timestamp="20230327 13:06:02.482" level="INFO">Mouse click: id:num0Button</msg>
+<msg timestamp="20230327 13:06:02.482" level="INFO">Click type 'click' at (176, 682)</msg>
+<status status="PASS" starttime="20230327 13:06:02.481" endtime="20230327 13:06:02.604"/>
+</kw>
+<status status="PASS" starttime="20230327 13:06:02.481" endtime="20230327 13:06:02.604"/>
+</iter>
+<status status="PASS" starttime="20230327 13:06:02.200" endtime="20230327 13:06:02.604"/>
+</for>
+<kw name="Sleep" library="BuiltIn">
+<arg>1</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20230327 13:06:03.619" level="INFO">Slept 1 second</msg>
+<status status="PASS" starttime="20230327 13:06:02.604" endtime="20230327 13:06:03.619"/>
+</kw>
+<kw name="Mouse Click" library="RPA.Desktop.Windows">
+<arg>id:equalButton</arg>
+<doc>Mouse click `locator`, `coordinates`, or `image`</doc>
+<msg timestamp="20230327 13:06:03.619" level="INFO">Mouse click: id:equalButton</msg>
+<msg timestamp="20230327 13:06:03.620" level="INFO">Click type 'click' at (333, 682)</msg>
+<status status="PASS" starttime="20230327 13:06:03.619" endtime="20230327 13:06:03.747"/>
+</kw>
+<kw name="Get Text" library="RPA.Desktop.Windows">
+<var>${result}</var>
+<arg>id:CalculatorResults</arg>
+<doc>Get text from element</doc>
+<msg timestamp="20230327 13:06:03.751" level="INFO">${result} = {'value': None, 'children_texts': '', 'rich_text': 'Display is 0', 'legacy_value': '', 'legacy_name': 'Display is 4,000'}</msg>
+<status status="PASS" starttime="20230327 13:06:03.747" endtime="20230327 13:06:03.751"/>
+</kw>
+<kw name="Get From Dictionary" library="Collections">
+<var>${my_value}</var>
+<arg>${result}</arg>
+<arg>legacy_name</arg>
+<doc>Returns a value from the given ``dictionary`` based on the given ``key``.</doc>
+<msg timestamp="20230327 13:06:03.753" level="INFO">${my_value} = Display is 4,000</msg>
+<status status="PASS" starttime="20230327 13:06:03.752" endtime="20230327 13:06:03.753"/>
+</kw>
+<kw name="Log To Console" library="BuiltIn">
+<arg>"multiplication value ${my_value}"</arg>
+<doc>Logs the given message to the console.</doc>
+<status status="PASS" starttime="20230327 13:06:03.753" endtime="20230327 13:06:03.753"/>
+</kw>
+<kw name="Sleep" library="BuiltIn">
+<arg>2</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20230327 13:06:05.768" level="INFO">Slept 2 seconds</msg>
+<status status="PASS" starttime="20230327 13:06:03.753" endtime="20230327 13:06:05.768"/>
+</kw>
+<kw name="Mouse Click" library="RPA.Desktop.Windows">
+<arg>id:clearButton</arg>
+<doc>Mouse click `locator`, `coordinates`, or `image`</doc>
+<msg timestamp="20230327 13:06:05.769" level="INFO">Mouse click: id:clearButton</msg>
+<msg timestamp="20230327 13:06:05.769" level="INFO">Click type 'click' at (254, 417)</msg>
+<status status="PASS" starttime="20230327 13:06:05.768" endtime="20230327 13:06:06.066"/>
+</kw>
+<status status="PASS" starttime="20230327 13:06:00.289" endtime="20230327 13:06:06.066"/>
+</kw>
+<kw name="close calculator" library="calculatorkey">
+<kw name="Mouse Click" library="RPA.Desktop.Windows">
+<arg>id:Close</arg>
+<doc>Mouse click `locator`, `coordinates`, or `image`</doc>
+<msg timestamp="20230327 13:06:06.067" level="INFO">Mouse click: id:Close</msg>
+<msg timestamp="20230327 13:06:06.068" level="INFO">Click type 'click' at (352, 196)</msg>
+<status status="PASS" starttime="20230327 13:06:06.067" endtime="20230327 13:06:06.647"/>
+</kw>
+<status status="PASS" starttime="20230327 13:06:06.067" endtime="20230327 13:06:06.647"/>
+</kw>
+<status status="PASS" starttime="20230327 13:05:37.991" endtime="20230327 13:06:06.648"/>
+</test>
+<status status="PASS" starttime="20230327 13:05:37.000" endtime="20230327 13:06:06.649"/>
+</suite>
+<statistics>
+<total>
+<stat pass="1" fail="0" skip="0">All Tasks</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat pass="1" fail="0" skip="0" id="s1" name="Calculator">Calculator</stat>
+</suite>
+</statistics>
+<errors>
+<msg timestamp="20230327 13:05:37.870" level="WARN">c:\ProgramData\robocorp\ht\3f6004c_b1f3c24_1c0bc041\lib\site-packages\RPA\Desktop\Windows.py:216: FutureWarning: `RPA.Desktop.Windows` got deprecated and will be no longer maintained, please use `RPA.Windows` instead (https://robocorp.com/docs/libraries/rpa-framework/rpa-windows)
+  deprecation(
+</msg>
+</errors>
+</robot>

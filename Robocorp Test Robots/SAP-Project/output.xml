@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 5.0.1 (Python 3.11.3 on win32)" generated="20230516 10:58:54.082" rpa="true" schemaversion="3">
+<suite id="s1" name="reconciliationCheck" source="C:\Users\admin\Downloads\RoboCorp\Robocorp Test Robots\SAP-Project\reconciliationCheck.robot">
+<test id="s1-t1" name="main task" line="21">
+<kw name="main page">
+<kw name="Create List" library="BuiltIn">
+<var>${auth_data}</var>
+<arg>${username}</arg>
+<arg>${password}</arg>
+<doc>Returns a list containing given items.</doc>
+<msg timestamp="20230516 10:58:56.584" level="INFO">${auth_data} = ['{"CompanyDB": "SBODemoGB","UserName": "favas"}', 'Test@123']</msg>
+<status status="PASS" starttime="20230516 10:58:56.584" endtime="20230516 10:58:56.584"/>
+</kw>
+<kw name="Create Session" library="RequestsLibrary">
+<arg>${sessionname}</arg>
+<arg>${base_url}/Login</arg>
+<arg>auth=${auth_data}</arg>
+<doc>Create Session: create a HTTP session to a server</doc>
+<msg timestamp="20230516 10:58:56.584" level="INFO">Creating Session using : alias=sapb, url=http://151.80.190.234:50001/b1s/v1/Login, headers={},                     cookies={}, auth=&lt;requests.auth.HTTPBasicAuth object at 0x000001DDC4251F90&gt;, timeout=None, proxies=None, verify=False,                     debug=0 </msg>
+<status status="PASS" starttime="20230516 10:58:56.584" endtime="20230516 10:58:56.584"/>
+</kw>
+<status status="PASS" starttime="20230516 10:58:56.583" endtime="20230516 10:58:56.585"/>
+</kw>
+<kw name="first page">
+<var>${excelinfo}</var>
+<var>${exceld}</var>
+<kw name="Open Workbook" library="RPA.Excel.Files">
+<arg>${url}</arg>
+<doc>Open an existing Excel workbook.</doc>
+<msg timestamp="20230516 10:58:56.587" level="FAIL">FileNotFoundError: [WinError 3] The system cannot find the path specified: 'C:\\Users\\admin\\Downloads\\RoboCorp\\Robocorp Test Robots\\SAP-Project\\SAP-Project\\input\\OBNK-sheet.xlsx'</msg>
+<status status="FAIL" starttime="20230516 10:58:56.585" endtime="20230516 10:58:56.695"/>
+</kw>
+<kw name="Set Active Worksheet" library="RPA.Excel.Files">
+<arg>Sheet1</arg>
+<doc>Set the active worksheet.</doc>
+<status status="NOT RUN" starttime="20230516 10:58:56.695" endtime="20230516 10:58:56.695"/>
+</kw>
+<kw name="Get Cell Value" library="RPA.Excel.Files">
+<var>${code}</var>
+<arg>1</arg>
+<arg>2</arg>
+<doc>Get a cell value in the given worksheet.</doc>
+<status status="NOT RUN" starttime="20230516 10:58:56.695" endtime="20230516 10:58:56.695"/>
+</kw>
+<kw name="Read Worksheet As Table" library="RPA.Excel.Files">
+<var>${exceldata}</var>
+<arg>header=True</arg>
+<arg>start=2</arg>
+<arg>trim=${True}</arg>
+<doc>Read the contents of a worksheet into a Table container. Allows
+sorting/filtering/manipulating using the ``RPA.Tables`` library.</doc>
+<status status="NOT RUN" starttime="20230516 10:58:56.696" endtime="20230516 10:58:56.696"/>
+</kw>
+<kw name="Save Workbook" library="RPA.Excel.Files">
+<doc>Save the active workbook.</doc>
+<status status="NOT RUN" starttime="20230516 10:58:56.696" endtime="20230516 10:58:56.696"/>
+</kw>
+<status status="FAIL" starttime="20230516 10:58:56.585" endtime="20230516 10:58:56.696"/>
+</kw>
+<kw name="second page">
+<arg>${excelinfo}</arg>
+<arg>${exceld}</arg>
+<status status="NOT RUN" starttime="20230516 10:58:56.696" endtime="20230516 10:58:56.696"/>
+</kw>
+<status status="FAIL" starttime="20230516 10:58:56.583" endtime="20230516 10:58:56.697">FileNotFoundError: [WinError 3] The system cannot find the path specified: 'C:\\Users\\admin\\Downloads\\RoboCorp\\Robocorp Test Robots\\SAP-Project\\SAP-Project\\input\\OBNK-sheet.xlsx'</status>
+</test>
+<doc>account reconciliation using RPA</doc>
+<status status="FAIL" starttime="20230516 10:58:54.084" endtime="20230516 10:58:56.697"/>
+</suite>
+<statistics>
+<total>
+<stat pass="0" fail="1" skip="0">All Tasks</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat pass="0" fail="1" skip="0" id="s1" name="reconciliationCheck">reconciliationCheck</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>
