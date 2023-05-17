@@ -17,6 +17,7 @@ ${bank}    100000
 ${bank1}    450005
 ${success_msg}      Reconciliation Success
 ${fail_msg}      Reconciliation Failure
+${fail_msg2}       Record Not Found
 *** Tasks ***
 main task 
     main page
@@ -46,29 +47,55 @@ second page
         ${Detailslist}=    Create List
         ${headers}=  Create Dictionary  Content-Type=application/json
         #getting Excel data through loop
+        Log To Console      ${exceld}
         FOR    ${sales_rep}    IN    @{exceld}
             ${exTransID}    Set Variable    ${sales_rep}[Transaction ID]
-            ${exTransID}    Run Keyword If    '${exTransID}' == 'None'    Set Variable    0    ELSE    Set Variable    ${exTransID}
-            ${exTransdate}    Set Variable    ${sales_rep}[Transaction date]
-            ${exTransdate}       Convert Date    ${exTransdate}    result_format=%Y-%m-%dT%H:%M:%SZ
-            Log To Console      ${exTransdate}
-            # ${exTransdate}    Convert Date    ${sales_rep}[Transaction date]    result_format=%d%m%Y 
-            # ${exTransdate}    Convert To Number    ${exTransdate}
-            ${exRefno}    Set Variable    ${sales_rep}[reference No.]
-            ${exRefno}    Run Keyword If    '${exRefno}' == 'None'    Set Variable    0    ELSE    Set Variable    ${exRefno}
-            ${exDetails}    Set Variable    ${sales_rep}[Details]
-            ${exDetails}    Run Keyword If    '${exDetails}' == 'None'    Set Variable    0    ELSE    Set Variable    ${exDetails}
-            ${exDebit}    Set Variable    ${sales_rep}[Debit]
-            ${exDebit}    Run Keyword If    '${exDebit}' == 'None'    Set Variable    0    ELSE    Set Variable    ${exDebit}
-            ${exCredit}    Set Variable    ${sales_rep}[Credit]
-            ${exCredit}    Run Keyword If    '${exCredit}' == 'None'    Set Variable    0    ELSE    Set Variable    ${exCredit}
-            Append To List    ${TransIDlist}    ${exTransID}
-            Append To List    ${Transdatelist}    ${exTransdate}
-            Append To List    ${Refnolist}    ${exRefno}
-            Append To List    ${Debitlist}    ${exDebit}
-            Append To List    ${Creditlist}    ${exCredit}
-            Append To List    ${Detailslist}    ${exDetails}
-            END
+            Log To Console    TransID: ${exTransID}
+            ${TransCheck}    Get Request    ${sessionname}    ${base_url}/JournalEntries(${exTransID})/JournalEntryLines
+            Log To Console  Status Code: ${TransCheck.status_code}
+            # IF  ${TransCheck.status_code} != 200
+            #     ${ErrorMsg2}     Set Variable    ${TransCheck.json()['error']['message']['value']}
+            #     # Log To Console      \nMsg: ${ErrorMsg}\n
+            #     Open Workbook    ${url}
+            #     Set Active Worksheet    Sheet1
+            #     Set Styles    G3:G5
+            #     ...  color=ffffff
+            #     ...  align_horizontal=center
+            #     ...  align_vertical=center
+            #     ...  bold=True
+            #     ...  cell_fill=DC143C
+            #     # ...  wrap_text=True
+            #     Set Cell Value  4   7     ${fail_msg2}
+            #     Set Cell Value  5   7     Value: ${ErrorMsg2}
+            #     Set Cell Format    5   7
+            #     ...   wrap_text=True
+                
+            #     Save Workbook
+            #     Log To Console      Reconciliation Failed
+            #     Log To Console      Transaction Not Found
+            # ELSE
+                ${exTransID}    Run Keyword If    '${exTransID}' == 'None'    Set Variable    0    ELSE    Set Variable    ${exTransID}
+                ${exTransdate}    Set Variable    ${sales_rep}[Transaction date]
+                ${exTransdate}       Convert Date    ${exTransdate}    result_format=%Y-%m-%dT%H:%M:%SZ
+                Log To Console      ${exTransdate}
+                # ${exTransdate}    Convert Date    ${sales_rep}[Transaction date]    result_format=%d%m%Y 
+                # ${exTransdate}    Convert To Number    ${exTransdate}
+                ${exRefno}    Set Variable    ${sales_rep}[reference No.]
+                ${exRefno}    Run Keyword If    '${exRefno}' == 'None'    Set Variable    0    ELSE    Set Variable    ${exRefno}
+                ${exDetails}    Set Variable    ${sales_rep}[Details]
+                ${exDetails}    Run Keyword If    '${exDetails}' == 'None'    Set Variable    0    ELSE    Set Variable    ${exDetails}
+                ${exDebit}    Set Variable    ${sales_rep}[Debit]
+                ${exDebit}    Run Keyword If    '${exDebit}' == 'None'    Set Variable    0    ELSE    Set Variable    ${exDebit}
+                ${exCredit}    Set Variable    ${sales_rep}[Credit]
+                ${exCredit}    Run Keyword If    '${exCredit}' == 'None'    Set Variable    0    ELSE    Set Variable    ${exCredit}
+                Append To List    ${TransIDlist}    ${exTransID}
+                Append To List    ${Transdatelist}    ${exTransdate}
+                Append To List    ${Refnolist}    ${exRefno}
+                Append To List    ${Debitlist}    ${exDebit}
+                Append To List    ${Creditlist}    ${exCredit}
+                Append To List    ${Detailslist}    ${exDetails}
+            # END
+        END
         #    posting bankpages details
         ${list_length}=    Evaluate    len(${TransIDlist})
         FOR    ${counter}    IN RANGE    0    ${list_length}-1 
@@ -100,6 +127,7 @@ second page
                     ${customer_data1}    Set Variable    ${customer_response1.json()['value'][0]}
                     ${AccountCode}    Set Variable    ${customer_data1['AccountCode']}
                     ${Sequence}    Set Variable    ${customer_data1['Sequence']}
+                    Log to Console      Sequencseeeeeeee: ${Sequence}
                     ${AccountName}    Set Variable    ${customer_data1['AccountName']}   
                     ${DueDate1}    Set Variable    ${customer_data1['DueDate']}   
                     ${DueDate1}    Convert Date    ${customer_data1['DueDate']}    result_format=%d%m%Y 
@@ -144,7 +172,7 @@ second page
                                         ${line_id}=    Get From Dictionary    ${dict}    Line_ID
                                         ${count}=    Evaluate    ${count}+1    
                                     END
-                                    log to console   ${count}
+                                    log to console   Count: ${count}
                             #iterate the journal entries lines to get the match details
                                 FOR    ${counter}    IN RANGE    0    ${count}    
                                             ${customer_data}    Set Variable    ${customer_response.json()['JournalEntryLines'][${counter}]}
@@ -178,14 +206,22 @@ second page
         ${sequencelist}    Remove Duplicates    ${sequencelist}
         #  ${linidlist}    Remove Duplicates    ${linidlist}
         ${TransIDlist}    Remove Duplicates    ${TransIDlist}
+        ${linidlist_length}=    Get Length    ${linidlist}
+        IF    ${linidlist_length} == 0
+            Log To Console      "There are no transaction with these details Or Already Reconciled..."
+        ELSE
+            Log To Console      \nLineIdList: ${linidlist}\nTransId: ${TransIDlist}\nAccountCode: ${coded}\nSequenceList:${sequencelist}\n
         # posting external reconciliation
-        posting ExternalReconciliation    ${linidlist}    ${TransIDlist}    ${coded}    ${sequencelist}  ${headers}       #uncomment
-        # Log To Console      \nLineIdList: ${linidlist}\nTransId: ${TransIDlist}\nAccountCode: ${coded}\nSequenceList:${sequencelist}\n
+        posting ExternalReconciliation    ${linidlist}    ${TransIDlist}    ${coded}    ${sequencelist}  ${headers}     
+        
+    END
 
 
 posting ExternalReconciliation 
     [Arguments]    ${linidlist}    ${TransIDlist}    ${coded}    ${sequencelist}    ${headers}  
-        ${payload3}    Set Variable  {"ExternalReconciliation": {"ReconciliationAccountType": "${datatype}","ReconciliationBankStatementLines":[{"BankStatementAccountCode": "${coded}","Sequence": ${sequencelist}[0]},{"BankStatementAccountCode": "${coded}","Sequence": ${sequencelist}[1]}],"ReconciliationJournalEntryLines":[{"LineNumber": ${linidlist}[0],"TransactionNumber": ${TransIDlist}[0]},{"LineNumber": ${linidlist}[1],"TransactionNumber": ${TransIDlist}[1]}]}}          
+    Log To Console      Line Id1: ${linidlist}[0],Line Id2:${linidlist}[1]
+    IF      ${linidlist}
+        ${payload3}    Set Variable  {"ExternalReconciliation": {"ReconciliationAccountType": "${datatype}","ReconciliationBankStatementLines":[ {"BankStatementAccountCode": "${coded}","Sequence": ${sequencelist}[0]},{"BankStatementAccountCode": "${coded}","Sequence": ${sequencelist}[1]}],"ReconciliationJournalEntryLines":[{"LineNumber": ${linidlist}[0],"TransactionNumber": ${TransIDlist}[0]},{"LineNumber": ${linidlist}[1],"TransactionNumber": ${TransIDlist}[1]}]}}          
         ${response}=  Post Request  ${sessionname}    ${base_url}/ExternalReconciliationsService_Reconcile  data=${payload3}  headers=${headers}
         IF    ${response.status_code} == 204
             Open Workbook    ${url}
@@ -219,3 +255,4 @@ posting ExternalReconciliation
             Save Workbook
             Log To Console      Reconciliation Failed
         END
+    END
