@@ -11,7 +11,7 @@ ${base_url}    http://151.80.190.234:50001/b1s/v1
 ${username}    {"CompanyDB": "SBODemoGB","UserName": "favas"}
 ${password}    Test@123
 ${sessionname}    sapb
-${url}          ${OUTPUT_DIR}${/}/OBNK-sheet.xlsx
+${url}          ${OUTPUT_DIR}${/}/OBNK-Sheet.xlsx
 ${datatype}    rat_BusinessPartner
 ${bank}    100000
 ${bank1}    450005
