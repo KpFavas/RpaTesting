@@ -52,7 +52,7 @@ second page
             ${exTransID}    Set Variable    ${sales_rep}[Transaction ID]
             Log To Console    TransID: ${exTransID}
             ${TransCheck}    Get Request    ${sessionname}    ${base_url}/JournalEntries(${exTransID})/JournalEntryLines
-            Log To Console  Status Code: ${TransCheck.status_code}
+            Log To Console  Status Code:  ${TransCheck.status_code}
             # IF  ${TransCheck.status_code} != 200
             #     ${ErrorMsg2}     Set Variable    ${TransCheck.json()['error']['message']['value']}
             #     # Log To Console      \nMsg: ${ErrorMsg}\n
