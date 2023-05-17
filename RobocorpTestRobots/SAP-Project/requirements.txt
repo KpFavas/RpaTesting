@@ -1,6 +1,5 @@
 robotframework
 robotframework-requests
-robotframework-collections
 robotframework-excellibrary
 robotframework-string
 robotframework-datetime
