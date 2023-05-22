@@ -6,11 +6,12 @@ Library     RPA.Excel.Files
 Library     String
 Library     DateTime
 Library     RPA.Browser.Selenium
+Library     JSONLibrary
 *** Variables ***
-${base_url}    http://151.80.190.234:50001/b1s/v1
+${base_url}    %{SERVICE_LAYER_BASE_URL}
 ${username}    {"CompanyDB": "SBODemoGB","UserName": "favas"}
-${password}    Test@123
-${sessionname}    sapb
+${password}    %{PASSWORD}
+${sessionname}    %{SESSION}
 ${url}          ${OUTPUT_DIR}${/}/OBNK-Sheet.xlsx
 ${datatype}    rat_BusinessPartner
 ${bank}    100000
@@ -18,13 +19,14 @@ ${bank1}    450005
 ${success_msg}      Reconciliation Success
 ${fail_msg}      Reconciliation Failure
 ${fail_msg2}       Record Not Found
-*** Tasks ***
+*** Tasks ***    
 main task 
     main page
     ${excelinfo}    ${exceld}    first page
     second page    ${excelinfo}    ${exceld}
 *** Keywords ***
 main page
+    
     ${auth_data}=    Create List    ${username}    ${password}
     Create Session    ${sessionname}    ${base_url}/Login    auth=${auth_data}
 
@@ -37,6 +39,8 @@ first page
         [Return]    ${exceldata}    ${code}
 second page
     [Arguments]    ${exceld}    ${coded}
+        Log To Console      \nUser Sata${username}
+
         ${linidlist}=    Create List
         ${Refnolist}=    Create List
         ${Debitlist}=    Create List
@@ -53,27 +57,6 @@ second page
             Log To Console    TransID: ${exTransID}
             ${TransCheck}    Get Request    ${sessionname}    ${base_url}/JournalEntries(${exTransID})/JournalEntryLines
             Log To Console  Status Code: ${TransCheck.status_code}
-            # IF  ${TransCheck.status_code} != 200
-            #     ${ErrorMsg2}     Set Variable    ${TransCheck.json()['error']['message']['value']}
-            #     # Log To Console      \nMsg: ${ErrorMsg}\n
-            #     Open Workbook    ${url}
-            #     Set Active Worksheet    Sheet1
-            #     Set Styles    G3:G5
-            #     ...  color=ffffff
-            #     ...  align_horizontal=center
-            #     ...  align_vertical=center
-            #     ...  bold=True
-            #     ...  cell_fill=DC143C
-            #     # ...  wrap_text=True
-            #     Set Cell Value  4   7     ${fail_msg2}
-            #     Set Cell Value  5   7     Value: ${ErrorMsg2}
-            #     Set Cell Format    5   7
-            #     ...   wrap_text=True
-                
-            #     Save Workbook
-            #     Log To Console      Reconciliation Failed
-            #     Log To Console      Transaction Not Found
-            # ELSE
                 ${exTransID}    Run Keyword If    '${exTransID}' == 'None'    Set Variable    0    ELSE    Set Variable    ${exTransID}
                 ${exTransdate}    Set Variable    ${sales_rep}[Transaction date]
                 ${exTransdate}       Convert Date    ${exTransdate}    result_format=%Y-%m-%dT%H:%M:%SZ
