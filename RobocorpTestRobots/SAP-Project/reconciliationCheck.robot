@@ -6,11 +6,9 @@ Library     RPA.Excel.Files
 Library     String
 Library     DateTime
 Library     RPA.Browser.Selenium
-Library     JSONLibrary
 *** Variables ***
 ${base_url}    %{SERVICE_LAYER_BASE_URL}
 ${username}    {"CompanyDB": "SBODemoGB","UserName": "favas"}
-# ${usercheck}    %{userCheck}
 ${password}    %{PASSWORD}
 ${sessionname}    %{SESSION}
 ${url}          ${OUTPUT_DIR}${/}/OBNK-Sheet.xlsx
