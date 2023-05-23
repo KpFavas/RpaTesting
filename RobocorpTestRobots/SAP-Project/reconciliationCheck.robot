@@ -7,10 +7,10 @@ Library     String
 Library     DateTime
 Library     RPA.Browser.Selenium
 *** Variables ***
-${base_url}    %{SERVICE_LAYER_BASE_URL}
+${base_url}    http://151.80.190.234:50001/b1s/v1
 ${username}    {"CompanyDB": "SBODemoGB","UserName": "favas"}
-${password}    %{PASSWORD}
-${sessionname}    %{SESSION}
+${password}    Test@123
+${sessionname}    sapb
 ${url}          ${OUTPUT_DIR}${/}/OBNK-Sheet.xlsx
 ${datatype}    rat_BusinessPartner
 ${bank}    100000
