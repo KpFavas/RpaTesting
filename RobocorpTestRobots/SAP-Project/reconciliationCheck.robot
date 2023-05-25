@@ -72,26 +72,7 @@ second page
         FOR    ${sales_rep}    IN    @{exceld}
             ${exTransID}    Set Variable    ${sales_rep}[Transaction ID]
             Log To Console    TransID: ${exTransID}
-            # ${TransCheck}    Get Request    ${sessionname}    ${base_url}/JournalEntries(${exTransID})/JournalEntryLines
-            # IF  ${TransCheck.status_code} != 200
-            #     ${ErrorMsg2}     Set Variable    ${TransCheck.json()['error']['message']['value']}
-            #     # Log To Console      \nMsg: ${ErrorMsg}\n
-            #     Open Workbook    ${url}
-            #     Set Active Worksheet    Sheet1
-            #     Set Styles    G3:G5
-            #     ...  color=ffffff
-            #     ...  align_horizontal=center
-            #     ...  align_vertical=center
-            #     ...  bold=True
-            #     ...  cell_fill=DC143C
-            #     # ...  wrap_text=True
-            #     Set Cell Value  4   7     ${fail_msg2}
-            #     Set Cell Value  5   7     Value: ${ErrorMsg2}
-            #     Save Workbook
-            #     Log To Console      Reconciliation Failed
-            #     Log To Console      Transaction Not Found
-            # ELSE
-            # Log To Console  Status Code: ${TransCheck.status_code}
+           
                 ${exTransID}    Run Keyword If    '${exTransID}' == 'None'    Set Variable    0    ELSE    Set Variable    ${exTransID}
                 ${exTransdate}    Set Variable    ${sales_rep}[Transaction date]
                 ${exTransdate}       Convert Date    ${exTransdate}    result_format=%Y-%m-%dT%H:%M:%SZ
