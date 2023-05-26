@@ -22,8 +22,8 @@ ${rev_bank}      161012
 *** Tasks ***    
 main task 
     main page
-    ${excelinfo}    ${exceld}    first page
-    # second page    ${excelinfo}    ${exceld}
+    ${excelinfo}    ${exceld}   ${From_Date}    ${To_Date}    first page
+    second page    ${excelinfo}    ${exceld}    ${From_Date}    ${To_Date}
 *** Keywords ***
 main page
     
@@ -34,101 +34,134 @@ first page
         Open Workbook    ${url}
         Set Active Worksheet    Sheet1
         ${code}     Get Cell Value    1    2
-        ${From_Date}     Get Cell Value    3    3
+        ${From_Date}     Get Cell Value    2    3
         ${From_Date}    Convert Date    ${From_Date}    result_format=%Y-%m-%dT%H:%M:%SZ
         ${To_Date}     Get Cell Value    3    3
         ${To_Date}    Convert Date    ${To_Date}    result_format=%Y-%m-%dT%H:%M:%SZ
         ${exceldata}=    Read Worksheet As Table    header=True    start=5    trim=${True}
-        Log To Console      Excel data: ${exceldata}
-        Log To Console      Excel Account Code: ${code}
-        FOR    ${data}    IN    @{exceldata}
-            ${Excel_TransID}    Set Variable    ${data}[Transaction ID]
-            ${Excel_Debit}    Set Variable    ${data}[Debit]
-            ${Excel_Credit}    Set Variable    ${data}[Credit]
-            ${Excel_Details}    Set Variable    ${data}[Details]
-            Log To Console    \nTransID: ${Excel_TransID}\n
-            Log To Console    From: ${From_Date}\n
-            Log To Console    To: ${To_Date}\n
-            Log To Console    Debit: ${Excel_Debit}\n
-            Log To Console    Credit: ${Excel_Credit}\n
-            Log To Console    Details: ${Excel_Details}\n
-        END
-        Save Workbook
-        [Return]    ${exceldata}    ${code}
+       
+        Save Workbook   
+        [Return]    ${exceldata}    ${code}     ${From_Date}    ${To_Date}  
 second page
-    [Arguments]    ${exceld}    ${coded}
+    [Arguments]    ${exceld}    ${coded}     ${From_Date}    ${To_Date}
 
-        ${linidlist}=    Create List
-        ${Refnolist}=    Create List
-        ${Debitlist}=    Create List
-        ${Creditlist}=    Create List
-        ${sequencelist}=    Create List
-        ${TransIDlist}=    Create List
-        ${Transdatelist}=    Create List
-        ${Detailslist}=    Create List
-        ${headers}=  Create Dictionary  Content-Type=application/json
-        # getting Excel data through loop
-        Log To Console      ${exceld}
-        FOR    ${sales_rep}    IN    @{exceld}
-            ${exTransID}    Set Variable    ${sales_rep}[Transaction ID]
-            Log To Console    TransID: ${exTransID}
-           
-                ${exTransID}    Run Keyword If    '${exTransID}' == 'None'    Set Variable    0    ELSE    Set Variable    ${exTransID}
-                ${exTransdate}    Set Variable    ${sales_rep}[Transaction date]
-                ${exTransdate}       Convert Date    ${exTransdate}    result_format=%Y-%m-%dT%H:%M:%SZ
-                Log To Console      ${exTransdate}
-                # ${exTransdate}    Convert Date    ${sales_rep}[Transaction date]    result_format=%d%m%Y 
-                # ${exTransdate}    Convert To Number    ${exTransdate}
-                ${exRefno}    Set Variable    ${sales_rep}[reference No.]
-                ${exRefno}    Run Keyword If    '${exRefno}' == 'None'    Set Variable    0    ELSE    Set Variable    ${exRefno}
-                ${exDetails}    Set Variable    ${sales_rep}[Details]
-                ${exDetails}    Run Keyword If    '${exDetails}' == 'None'    Set Variable    0    ELSE    Set Variable    ${exDetails}
-                ${exDebit}    Set Variable    ${sales_rep}[Debit]
-                ${exDebit}    Run Keyword If    '${exDebit}' == 'None'    Set Variable    0    ELSE    Set Variable    ${exDebit}
-                ${exCredit}    Set Variable    ${sales_rep}[Credit]
-                ${exCredit}    Run Keyword If    '${exCredit}' == 'None'    Set Variable    0    ELSE    Set Variable    ${exCredit}
-                Append To List    ${TransIDlist}    ${exTransID}
-                Append To List    ${Transdatelist}    ${exTransdate}
-                Append To List    ${Refnolist}    ${exRefno}
-                Append To List    ${Debitlist}    ${exDebit}
-                Append To List    ${Creditlist}    ${exCredit}
-                Append To List    ${Detailslist}    ${exDetails}
-            # END
-        END
-        Log To Console      \nTrans Id List : ${TransIDlist}\n
-        Log To Console      Transdatelist : ${Transdatelist}\n
-        Log To Console      Transdatelist : ${Transdatelist}\n
-        Log To Console      Debitlist : ${Debitlist}\n
-        Log To Console      Creditlist : ${Creditlist}\n
-        Log To Console      Detailslist : ${Detailslist}\n
-        #    posting bankpages details
-    #     ${list_length}=    Evaluate    len(${TransIDlist})
-    #     FOR    ${counter}    IN RANGE    0    ${list_length}-1 
-    #         IF    ${Debitlist}[${counter}] == 0
-    #             ${payload1}    Set Variable         {"AccountCode": "${rev_bank}", "CreditAmount": "${Creditlist}[${counter}]", "DocNumberType": "bpdt_DocNum", "PaymentReference": ${Refnolist}[${counter}]}
-    #         ELSE
-    #             ${payload1}    Set Variable         {"AccountCode": "${rev_bank}", "DebitAmount": "${Debitlist}[${counter}]", "DocNumberType": "bpdt_DocNum", "PaymentReference": ${Refnolist}[${counter}]} 
-    #         END   
-    #         ${response}=  Post Request  ${sessionname}    ${base_url}/BankPages  data=${payload1}  headers=${headers}
-    #         IF    ${response.status_code} == 201
-    #             Log To Console    successbankpages
-    #         ELSE
-    #             Log To Console    failbankpages
-    #         END
-    #     END
+    ${linidlist}=    Create List
+    ${Refnolist}=    Create List
+    ${Debitlist}=    Create List
+    ${Creditlist}=    Create List
+    ${sequencelist}=    Create List
+    ${TransIDlist}=    Create List
+    ${Transdatelist}=    Create List
+    ${Detailslist}=    Create List
+    ${headers}=  Create Dictionary  Content-Type=application/json
+    # getting Excel data through loop
+    FOR    ${data}    IN    @{exceld}
+        ${Excel_TransID}    Set Variable    ${data}[Transaction ID]
+        ${Excel_Debit}    Set Variable    ${data}[Debit]
+        ${Excel_Credit}    Set Variable    ${data}[Credit]
+        ${Excel_Details}    Set Variable    ${data}[Details]
+        # Log To Console    \nTransID: ${Excel_TransID}\n
+        # Log To Console    From: ${From_Date}\n
+        # Log To Console    To: ${To_Date}\n
+        # Log To Console    Debit: ${Excel_Debit}\n
+        # Log To Console    Credit: ${Excel_Credit}\n
+        # Log To Console    Details: ${Excel_Details}\n
+        ${exTransID}    Set Variable    ${data}[Transaction ID]
+        ${exTransID}    Run Keyword If    '${exTransID}' == 'None'    Set Variable    0    ELSE    Set Variable    ${exTransID}
+        ${exTransdate}    Set Variable    ${data}[Transaction date]
+        ${exTransdate}       Convert Date    ${exTransdate}    result_format=%Y-%m-%dT%H:%M:%SZ
+        # Log To Console      ${exTransdate}
+        # ${exTransdate}    Convert Date    ${sales_rep}[Transaction date]    result_format=%d%m%Y 
+        # ${exTransdate}    Convert To Number    ${exTransdate}
+        ${exRefno}    Set Variable    ${data}[Reference No.]
+        ${exRefno}    Run Keyword If    '${exRefno}' == 'None'    Set Variable    0    ELSE    Set Variable    ${exRefno}
+        ${exDetails}    Set Variable    ${data}[Details]
+        ${exDetails}    Run Keyword If    '${exDetails}' == 'None'    Set Variable    0    ELSE    Set Variable    ${exDetails}
+        ${exDebit}    Set Variable    ${data}[Debit]
+        ${exDebit}    Run Keyword If    '${exDebit}' == 'None'    Set Variable    0    ELSE    Set Variable    ${exDebit}
+        ${exCredit}    Set Variable    ${data}[Credit]
+        ${exCredit}    Run Keyword If    '${exCredit}' == 'None'    Set Variable    0    ELSE    Set Variable    ${exCredit}
+        Append To List    ${TransIDlist}    ${exTransID}
+        Append To List    ${Transdatelist}    ${exTransdate}
+        Append To List    ${Refnolist}    ${exRefno}
+        Append To List    ${Debitlist}    ${exDebit}
+        Append To List    ${Creditlist}    ${exCredit}
+        Append To List    ${Detailslist}    ${exDetails}
+    END
+    # Log To Console      \nTrans Id List : ${TransIDlist}\n
+    # Log To Console      Transdatelist : ${Transdatelist}\n
+    # Log To Console      Refnolist : ${Refnolist}\n
+    # Log To Console      Debitlist : ${Debitlist}\n
+    # Log To Console      Creditlist : ${Creditlist}\n
+    # Log To Console      Detailslist : ${Detailslist}\n
+    #    posting bankpages details
+    ${list_length}=    Evaluate    len(${TransIDlist})
+    # Log To Console      List Length : ${list_length}\n
 
-        
-    #     # getting banktransaction details
-    #     ${DebitAmount1list}=    Create List
-    #     ${CreditAmount1list}=    Create List
-    #     ${DueDate1list}=    Create List
-    #     ${Memo1list}=    Create List
-    #     Log To Console      List Length: ${list_length}  -1
-    #     FOR    ${counter}    IN RANGE    0    ${list_length}-1
-    #         ${customer_response1}    Get Request    ${sessionname}    ${base_url}/BankPages?$select=AccountCode,PaymentReference,DueDate,CreditAmount,DebitAmount,Sequence,AccountName&$filter=AccountCode eq '${coded}' and CreditAmount eq ${Creditlist}[${counter}] and DebitAmount eq ${Debitlist}[${counter}] and DueDate eq '${Transdatelist}[${counter}]'&$orderby=Sequence desc 
-    #             IF  ${customer_response1.status_code} == 200
-    #                 # Log To Console    Response Val json: ${customer_response1.json()}
-    #                 # Log To Console    Response Val json: ${customer_response1.json()['value'][0]}
+    FOR    ${counter}    IN RANGE    0    ${list_length} 
+        # Log To Console       DebitCounter : ${Debitlist}[${counter}]\n
+
+        IF    ${Debitlist}[${counter}] == 0
+            # Log To Console      CeeeeCreditlistCounter : ${Creditlist}[${counter}]\n
+            # Log To Console      CeeeReferencelistCounter : ${Refnolist}[${counter}]\n
+            ${Ref_No}    Set Variable    ${Refnolist}[${counter}]
+            ${Ref_No}    Run Keyword If    '${Ref_No}' == '0'    Set Variable    null    ELSE    Set Variable    "${Ref_No}"
+            ${payload1}    Set Variable         {"AccountCode": "${rev_bank}", "CreditAmount": "${Creditlist}[${counter}]", "DocNumberType": "bpdt_DocNum", "Reference": ${Ref_No},"Memo":"${Detailslist}[${counter}]"}
+            Log To Console  PayLoad1: ${payload1}
+        END   
+        IF    ${Debitlist}[${counter}] != 0
+            # Log To Console      DeeeeDebitlistCounter : ${Debitlist}[${counter}]\n
+            #  Log To Console      DeeeeReferencelistCounter : ${Refnolist}[${counter}]\n
+            ${Ref_No}    Set Variable    ${Refnolist}[${counter}]
+            ${Ref_No}    Run Keyword If    '${Ref_No}' == '0'    Set Variable    null    ELSE    Set Variable    "${Ref_No}"
+            ${payload1}    Set Variable         {"AccountCode": "${rev_bank}", "DebitAmount": "${Debitlist}[${counter}]", "DocNumberType": "bpdt_DocNum", "Reference": ${Ref_No},"Memo":"${Detailslist}[${counter}]"} 
+            Log To Console  PayLoad1: ${payload1} 
+        # ${response}=  Post Request  ${sessionname}    ${base_url}/BankPages  data=${payload1}  headers=${headers}
+        # IF    ${response.status_code} == 201
+        #     Log To Console    successbankpages
+        #     Log To Console    successJSOn : ${response.json()}\n
+        # ELSE
+        #     Log To Console    failbankpages
+        #     Log To Console    Fail JSOn : ${response.json()}\n
+        # END
+    END
+# ////////////////////////////////////////////////
+    # getting banktransaction details
+    ${customer_response}    Get Request    ${sessionname}    ${base_url}/JournalEntries?$filter=DueDate le '${From_Date}' and DueDate ge '${To_Date}'
+    # IF    ${customer_response.status_code} == 200
+    #     ${Journal_Trans_data}    Set Variable    ${customer_response.json()}
+    Log To Console       JournalEntryResponse : ${customer_response.status_code}
+    # ELSE
+    #     Log To Console       JournalEntryResponse : ${Journal_Trans_data}
+    # END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# /////////////////////////////////////////////////
+        # # getting banktransaction details
+        # ${DebitAmount1list}=    Create List
+        # ${CreditAmount1list}=    Create List
+        # ${DueDate1list}=    Create List
+        # ${Memo1list}=    Create List
+        # Log To Console      List Length: ${list_length}  -1
+        # FOR    ${counter}    IN RANGE    0    ${list_length}-1
+        #     ${customer_response1}    Get Request    ${sessionname}    ${base_url}/BankPages?$select=AccountCode,PaymentReference,DueDate,CreditAmount,DebitAmount,Sequence,AccountName&$filter=AccountCode eq '${coded}' and CreditAmount eq ${Creditlist}[${counter}] and DebitAmount eq ${Debitlist}[${counter}] and DueDate eq '${Transdatelist}[${counter}]'&$orderby=Sequence desc 
+        #         IF  ${customer_response1.status_code} == 200
+        #             Log To Console    Response Val json: ${customer_response1.json()}
+                    # Log To Console    Response Val json: ${customer_response1.json()['value'][0]}
     #                 ${customer_data1}    Set Variable    ${customer_response1.json()['value'][0]}
     #                 ${AccountCode}    Set Variable    ${customer_data1['AccountCode']}
     #                 ${Sequence}    Set Variable    ${customer_data1['Sequence']}
@@ -147,10 +180,11 @@ second page
     #                 Append To List    ${CreditAmount1list}    ${CreditAmount1}
     #                 Append To List    ${DueDate1list}    ${DueDate1}
     #                 Append To List    ${Memo1list}    ${Memo1}   
-    #             ELSE
-    #             Log To Console  failgetbankpages  
-    #             END
-    #     END
+                ELSE
+                    Log To Console      Failed get bankpages\n
+                    Log To Console    Response Val json: ${customer_response1.json()}\n  
+                END
+        END
 
     #     # getting journal entries
     #     FOR    ${counter}    IN RANGE    0    ${list_length}
