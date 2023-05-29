@@ -6,6 +6,7 @@ Library     RPA.Excel.Files
 Library     String
 Library     DateTime
 Library     RPA.Browser.Selenium
+Library     JSONLibrary
 *** Variables ***
 ${base_url}    http://151.80.190.234:50001/b1s/v1
 ${username}    {"CompanyDB": "SBODemoGB","UserName": "favas"}
@@ -19,6 +20,7 @@ ${success_msg}      Reconciliation Success
 ${fail_msg}      Reconciliation Failure
 ${fail_msg2}       Record Not Found
 ${rev_bank}      161012
+${line_ID}      0
 *** Tasks ***    
 main task 
     main page
@@ -105,7 +107,7 @@ second page
             # Log To Console      CeeeeCreditlistCounter : ${Creditlist}[${counter}]\n
             # Log To Console      CeeeReferencelistCounter : ${Refnolist}[${counter}]\n
             ${Ref_No}    Set Variable    ${Refnolist}[${counter}]
-            ${Ref_No}    Run Keyword If    '${Ref_No}' == '0'    Set Variable    null    ELSE    Set Variable    "${Ref_No}"
+            ${Ref_No}    Run Keyword If    '${Ref_No}' == '0'    Set Variable    null    Else    Set Variable    "${Ref_No}"
             ${payload1}    Set Variable         {"AccountCode": "${rev_bank}", "CreditAmount": "${Creditlist}[${counter}]", "DocNumberType": "bpdt_DocNum", "Reference": ${Ref_No},"Memo":"${Detailslist}[${counter}]"}
             Log To Console  PayLoad1: ${payload1}
         END   
@@ -113,9 +115,10 @@ second page
             # Log To Console      DeeeeDebitlistCounter : ${Debitlist}[${counter}]\n
             #  Log To Console      DeeeeReferencelistCounter : ${Refnolist}[${counter}]\n
             ${Ref_No}    Set Variable    ${Refnolist}[${counter}]
-            ${Ref_No}    Run Keyword If    '${Ref_No}' == '0'    Set Variable    null    ELSE    Set Variable    "${Ref_No}"
+            ${Ref_No}    Run Keyword If    '${Ref_No}' == '0'    Set Variable    null    Else    Set Variable    "${Ref_No}"
             ${payload1}    Set Variable         {"AccountCode": "${rev_bank}", "DebitAmount": "${Debitlist}[${counter}]", "DocNumberType": "bpdt_DocNum", "Reference": ${Ref_No},"Memo":"${Detailslist}[${counter}]"} 
             Log To Console  PayLoad1: ${payload1} 
+        END
         # ${response}=  Post Request  ${sessionname}    ${base_url}/BankPages  data=${payload1}  headers=${headers}
         # IF    ${response.status_code} == 201
         #     Log To Console    successbankpages
@@ -127,13 +130,71 @@ second page
     END
 # ////////////////////////////////////////////////
     # getting banktransaction details
-    ${customer_response}    Get Request    ${sessionname}    ${base_url}/JournalEntries?$filter=DueDate le '${From_Date}' and DueDate ge '${To_Date}'
-    # IF    ${customer_response.status_code} == 200
-    #     ${Journal_Trans_data}    Set Variable    ${customer_response.json()}
-    Log To Console       JournalEntryResponse : ${customer_response.status_code}
-    # ELSE
-    #     Log To Console       JournalEntryResponse : ${Journal_Trans_data}
+    ${customer_response}    Get Request    ${sessionname}    ${base_url}/JournalEntries?$filter=DueDate ge '${From_Date}' and DueDate le '${To_Date}'
+    IF    ${customer_response.status_code} == 200
+        ${Journal_filter_data}    Set Variable    ${customer_response.json()}
+                # Log To Console    \n\nData :::::${Journal_filter_data}
+
+        ${line_ids}    Create List
+        ${account_codes}    Create List
+        ${credits}    Create List
+        ${debits}    Create List
+        ${amounts}    Create List
+        ${sorted_dict}    Create Dictionary 
+        ${filtered_data}    Create Dictionary 
+        # Log To Console      \nList : @{Journal_filter_data['value']['JournalEntryLines']}
+        FOR    ${entry}    IN    @{Journal_filter_data['value']}
+            FOR    ${journal_line}    IN    @{entry['JournalEntryLines']}
+                FOR    ${key}    ${value}    IN    &{journal_line}
+                    Set To Dictionary    ${sorted_dict}    ${key}    ${value}
+                END
+                
+                # ${sortedData}   	Get Dictionary Items	${sorted_dict}	
+                
+                ${account_code}    Get From Dictionary    ${sorted_dict}    AccountCode
+                # Log To Console    \n\nAccountCode :::::${account_code}
+                # Log To Console      \n\nDataSet :::::${sortedData}
+                IF    '${account_code}' == '${rev_bank}'
+                    FOR    ${key}    ${value}    IN    &{journal_line}
+                        Set To Dictionary    ${filtered_data}    ${key}    ${value}
+                    END
+                    # ${filtered_data}    Get From Dictionary
+                    # Log To Console      \n\nDataSet :::::${sortedData}
+                    Log To Console       \n AccountCode: ${account_code}
+                    # ${filtered_data}  Get Dictionary Items    ${sorted_dict}
+                    Log To Console       \n Filtered Data: ${filtered_data}
+
+
+                    ${line_id}  Get From Dictionary    ${sorted_dict}    Line_ID
+                    # Log To Console     \nLineID: ${line_id}
+                    ${debit}    Get From Dictionary    ${sorted_dict}    Debit
+                    ${credit}   Get From Dictionary    ${sorted_dict}    Credit
+                    
+                    Append To List    ${line_ids}    ${line_id}
+                    Append To List    ${debits}    ${debit}   
+                    Append To List    ${credits}    ${credit}    
+                END
+        END
+    END
+        # Log To Console        Line IDs: ${line_ids}
+        # Log To Console       Credits: ${credits}
+        # Log To Console       Debits: ${debits}
+
+        # Log To Console       Debits: 
+    ELSE
+        Log To Console      \nJournal Entry Get Failed...
+        Log To Console      \nJournalEntryResponse : \n${Journal_filter_data}
+    END
+    # ${Dic_length}    Evaluate    len(${sorted_dict})
+    # Log To Console      \n Length: ${Dic_length}
+    # Log To Console      \n Line: ${sorted_dict['Line_ID']}
+    # FOR     ${Data}     IN     ${sorted_dict['Line_ID']}
+    #     Log To Console      \n Line: ${Data}
+    # END 
+    # FOR     ${s}    IN       @{sorted_dict}
+    #         Log To Console      ${s['Line_ID']}
     # END
+    
 
 
 
@@ -180,11 +241,11 @@ second page
     #                 Append To List    ${CreditAmount1list}    ${CreditAmount1}
     #                 Append To List    ${DueDate1list}    ${DueDate1}
     #                 Append To List    ${Memo1list}    ${Memo1}   
-                ELSE
-                    Log To Console      Failed get bankpages\n
-                    Log To Console    Response Val json: ${customer_response1.json()}\n  
-                END
-        END
+        #         # ELSE
+        #             Log To Console      Failed get bankpages\n
+        #             Log To Console    Response Val json: ${customer_response1.json()}\n  
+        #         END
+        # END
 
     #     # getting journal entries
     #     FOR    ${counter}    IN RANGE    0    ${list_length}
