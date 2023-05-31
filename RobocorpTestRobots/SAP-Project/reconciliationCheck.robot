@@ -20,6 +20,7 @@ ${success_msg}      Reconciliation Success
 ${fail_msg}      Reconciliation Failure
 ${fail_msg2}       Record Not Found
 ${rev_bank}      161012
+${bank_charge_acc}      161012
 ${line_ID}      0
 *** Tasks ***    
 main task 
@@ -28,25 +29,21 @@ main task
     second page    ${excelinfo}    ${exceld}    ${From_Date}    ${To_Date}
 *** Keywords ***
 main page
-    
     ${auth_data}=    Create List    ${username}    ${password}
     Create Session    ${sessionname}    ${base_url}/Login    auth=${auth_data}
-
 first page
-        Open Workbook    ${url}
-        Set Active Worksheet    Sheet1
-        ${code}     Get Cell Value    1    2
-        ${From_Date}     Get Cell Value    2    3
-        ${From_Date}    Convert Date    ${From_Date}    result_format=%Y-%m-%dT%H:%M:%SZ
-        ${To_Date}     Get Cell Value    3    3
-        ${To_Date}    Convert Date    ${To_Date}    result_format=%Y-%m-%dT%H:%M:%SZ
-        ${exceldata}=    Read Worksheet As Table    header=True    start=5    trim=${True}
-       
-        Save Workbook   
-        [Return]    ${exceldata}    ${code}     ${From_Date}    ${To_Date}  
+    Open Workbook    ${url}
+    Set Active Worksheet    Sheet1
+    ${code}     Get Cell Value    1    2
+    ${From_Date}     Get Cell Value    2    3
+    ${From_Date}    Convert Date    ${From_Date}    result_format=%Y-%m-%dT%H:%M:%SZ
+    ${To_Date}     Get Cell Value    3    3
+    ${To_Date}    Convert Date    ${To_Date}    result_format=%Y-%m-%dT%H:%M:%SZ
+    ${exceldata}=    Read Worksheet As Table    header=True    start=5    trim=${True}
+    Save Workbook   
+    [Return]    ${exceldata}    ${code}     ${From_Date}    ${To_Date}  
 second page
     [Arguments]    ${exceld}    ${coded}     ${From_Date}    ${To_Date}
-
     ${linidlist}=    Create List
     ${Refnolist}=    Create List
     ${Debitlist}=    Create List
@@ -55,26 +52,19 @@ second page
     ${TransIDlist}=    Create List
     ${Transdatelist}=    Create List
     ${Detailslist}=    Create List
+    ${RecNumberlist}=    Create List
+    ${get_reconciled_data}    Create Dictionary 
     ${headers}=  Create Dictionary  Content-Type=application/json
-    # getting Excel data through loop
+    ########---getting Excel data through loop---########
     FOR    ${data}    IN    @{exceld}
         ${Excel_TransID}    Set Variable    ${data}[Transaction ID]
         ${Excel_Debit}    Set Variable    ${data}[Debit]
         ${Excel_Credit}    Set Variable    ${data}[Credit]
         ${Excel_Details}    Set Variable    ${data}[Details]
-        # Log To Console    \nTransID: ${Excel_TransID}\n
-        # Log To Console    From: ${From_Date}\n
-        # Log To Console    To: ${To_Date}\n
-        # Log To Console    Debit: ${Excel_Debit}\n
-        # Log To Console    Credit: ${Excel_Credit}\n
-        # Log To Console    Details: ${Excel_Details}\n
         ${exTransID}    Set Variable    ${data}[Transaction ID]
         ${exTransID}    Run Keyword If    '${exTransID}' == 'None'    Set Variable    0    ELSE    Set Variable    ${exTransID}
         ${exTransdate}    Set Variable    ${data}[Transaction date]
         ${exTransdate}       Convert Date    ${exTransdate}    result_format=%Y-%m-%dT%H:%M:%SZ
-        # Log To Console      ${exTransdate}
-        # ${exTransdate}    Convert Date    ${sales_rep}[Transaction date]    result_format=%d%m%Y 
-        # ${exTransdate}    Convert To Number    ${exTransdate}
         ${exRefno}    Set Variable    ${data}[Reference No.]
         ${exRefno}    Run Keyword If    '${exRefno}' == 'None'    Set Variable    0    ELSE    Set Variable    ${exRefno}
         ${exDetails}    Set Variable    ${data}[Details]
@@ -90,45 +80,47 @@ second page
         Append To List    ${Creditlist}    ${exCredit}
         Append To List    ${Detailslist}    ${exDetails}
     END
-    # Log To Console      \nTrans Id List : ${TransIDlist}\n
-    # Log To Console      Transdatelist : ${Transdatelist}\n
+    Log To Console      Transdatelist From Excel : ${Transdatelist}\n
     # Log To Console      Refnolist : ${Refnolist}\n
     # Log To Console      Debitlist : ${Debitlist}\n
     # Log To Console      Creditlist : ${Creditlist}\n
-    # Log To Console      Detailslist : ${Detailslist}\n
-    #    posting bankpages details
     ${list_length}=    Evaluate    len(${TransIDlist})
-    # Log To Console      List Length : ${list_length}\n
-
+    Log To Console      \nTrans_Id List Length(From Excel) : ${list_length}
     FOR    ${counter}    IN RANGE    0    ${list_length} 
-        # Log To Console       DebitCounter : ${Debitlist}[${counter}]\n
-
         IF    ${Debitlist}[${counter}] == 0
-            # Log To Console      CeeeeCreditlistCounter : ${Creditlist}[${counter}]\n
-            # Log To Console      CeeeReferencelistCounter : ${Refnolist}[${counter}]\n
             ${Ref_No}    Set Variable    ${Refnolist}[${counter}]
-            ${Ref_No}    Run Keyword If    '${Ref_No}' == '0'    Set Variable    null    Else    Set Variable    "${Ref_No}"
-            ${payload1}    Set Variable         {"AccountCode": "${rev_bank}", "CreditAmount": "${Creditlist}[${counter}]", "DocNumberType": "bpdt_DocNum", "Reference": ${Ref_No},"Memo":"${Detailslist}[${counter}]"}
-            Log To Console  PayLoad1: ${payload1}
+            IF      '${Ref_No}' == '0'
+                ${Ref_No}   Set Variable    null
+            ELSE
+                ${Ref_No}   Set Variable    ${Ref_No}
+            END
+            ${payload1}    Set Variable         {"AccountCode": "${rev_bank}", "CreditAmount": "${Creditlist}[${counter}]", "DocNumberType": "bpdt_DocNum", "Reference": "${Ref_No}","Memo":"${Detailslist}[${counter}]","DueDate":"${Transdatelist}[${counter}]"}
+            Log To Console      \nBank Page Post Body1:${payload1}
         END   
         IF    ${Debitlist}[${counter}] != 0
-            # Log To Console      DeeeeDebitlistCounter : ${Debitlist}[${counter}]\n
-            #  Log To Console      DeeeeReferencelistCounter : ${Refnolist}[${counter}]\n
             ${Ref_No}    Set Variable    ${Refnolist}[${counter}]
-            ${Ref_No}    Run Keyword If    '${Ref_No}' == '0'    Set Variable    null    Else    Set Variable    "${Ref_No}"
-            ${payload1}    Set Variable         {"AccountCode": "${rev_bank}", "DebitAmount": "${Debitlist}[${counter}]", "DocNumberType": "bpdt_DocNum", "Reference": ${Ref_No},"Memo":"${Detailslist}[${counter}]"} 
-            Log To Console  PayLoad1: ${payload1} 
+            IF      '${Ref_No}' == '0'
+                ${Ref_No}   Set Variable    null
+            ELSE
+                ${Ref_No}   Set Variable    ${Ref_No}
+            END
+            ${payload1}     Set variable        {"AccountCode": "${rev_bank}", "DebitAmount": "${Debitlist}[${counter}]", "DocNumberType": "bpdt_DocNum", "Reference": ${Ref_No},"Memo":"${Detailslist}[${counter}]","DueDate":"${Transdatelist}[${counter}]"} 
+            Log To Console      Bank Page Post Body2:${payload1}
         END
         # ${response}=  Post Request  ${sessionname}    ${base_url}/BankPages  data=${payload1}  headers=${headers}
         # IF    ${response.status_code} == 201
-        #     Log To Console    successbankpages
-        #     Log To Console    successJSOn : ${response.json()}\n
+        #     ${bankpage_response}    Set Variable    ${response.json()}
+        #     ${seqno}    Set Variable    ${bankpage_response['Sequence']}
+        #     Append To List    ${sequencelist}    ${seqno}
+        #     Log To Console    \nPOST BankPages:::::::::: - Success...
         # ELSE
-        #     Log To Console    failbankpages
-        #     Log To Console    Fail JSOn : ${response.json()}\n
+        #     Log To Console    \nPOST BankPages:::::::::: - Failed...
         # END
     END
+    Log To Console      \nSequenceList (From BankPages POST) :: ${sequencelist}
 # ////////////////////////////////////////////////
+    
+
     # getting banktransaction details
     ${customer_response}    Get Request    ${sessionname}    ${base_url}/JournalEntries?$filter=DueDate ge '${From_Date}' and DueDate le '${To_Date}'
     IF    ${customer_response.status_code} == 200
@@ -137,13 +129,18 @@ second page
 
         ${line_ids}    Create List
         ${account_codes}    Create List
-        ${credits}    Create List
-        ${debits}    Create List
-        ${amounts}    Create List
-        ${sorted_dict}    Create Dictionary 
+        ${credits}  Create List
+        ${debits}   Create List
+        ${amounts}  Create List
+        ${Trans_Ids}        Create List
+        ${JLine_DatesList}        Create List
+        ${sorted_dict}      Create Dictionary 
         ${filtered_data}    Create Dictionary 
+        
         # Log To Console      \nList : @{Journal_filter_data['value']['JournalEntryLines']}
         FOR    ${entry}    IN    @{Journal_filter_data['value']}
+            
+            # Log To Console      \nTransIds: ${Trans_Id}
             FOR    ${journal_line}    IN    @{entry['JournalEntryLines']}
                 FOR    ${key}    ${value}    IN    &{journal_line}
                     Set To Dictionary    ${sorted_dict}    ${key}    ${value}
@@ -155,51 +152,159 @@ second page
                 # Log To Console    \n\nAccountCode :::::${account_code}
                 # Log To Console      \n\nDataSet :::::${sortedData}
                 IF    '${account_code}' == '${rev_bank}'
+                    ${Trans_Id}     Set Variable    ${entry['JdtNum']}
+                    ${JLine_Date}   Set Variable    ${journal_line['DueDate']}
+                    # Log To Console      \nTransIds: ${Trans_Id}
                     FOR    ${key}    ${value}    IN    &{journal_line}
                         Set To Dictionary    ${filtered_data}    ${key}    ${value}
                     END
                     # ${filtered_data}    Get From Dictionary
                     # Log To Console      \n\nDataSet :::::${sortedData}
-                    Log To Console       \n AccountCode: ${account_code}
+                    # Log To Console       \n AccountCode: ${account_code}
                     # ${filtered_data}  Get Dictionary Items    ${sorted_dict}
-                    Log To Console       \n Filtered Data: ${filtered_data}
+                    # Log To Console       \n Filtered Data: ${filtered_data}
 
 
-                    ${line_id}  Get From Dictionary    ${sorted_dict}    Line_ID
+                    ${line_id}  Get From Dictionary    ${filtered_data}    Line_ID
                     # Log To Console     \nLineID: ${line_id}
-                    ${debit}    Get From Dictionary    ${sorted_dict}    Debit
-                    ${credit}   Get From Dictionary    ${sorted_dict}    Credit
+                    ${credit}    Get From Dictionary    ${filtered_data}    Debit
+                    ${debit}   Get From Dictionary    ${filtered_data}    Credit
                     
+                    Append To List    ${Trans_Ids}    ${Trans_Id}
+                    Append To List    ${JLine_DatesList}    ${JLine_Date}
                     Append To List    ${line_ids}    ${line_id}
                     Append To List    ${debits}    ${debit}   
-                    Append To List    ${credits}    ${credit}    
+                    Append To List    ${credits}    ${credit}  
+                END 
+            END
+        END
+        Log To Console      \nJournal Entry Get Details:
+        Log To Console      Trans IDs: ${Trans_Ids}
+        Log To Console      Due Dates: ${JLine_DatesList}
+        Log To Console      Line IDs: ${line_ids}
+        Log To Console      Credits: ${credits}
+        Log To Console      Debits: ${debits}
+        ${Dic_length}   Evaluate    len(@{line_ids})
+        # Log To Console      \n Length: ${Dic_length}
+        # Log To Console       Debits: 
+        Log To Console      \nGet Journal Entry - Succes...
+    ELSE
+        Log To Console      \nGet Journal Entry - Failed...
+        # Log To Console      \nJournalEntryResponse : \n${Journal_filter_data}
+    END
+    Log To Console      \n LengthFinal: ${Dic_length}
+    
+    FOR    ${index}    IN RANGE    ${Dic_length}
+        ${trans_id_tr}  Set Variable    ${Trans_Ids[${index}]}
+        ${jlinesdate_tr}  Set Variable    ${JLine_DatesList[${index}]}
+        ${line_id_tr}   Set Variable    ${line_ids[${index}]}
+        ${credit_tr}    Set Variable    ${credits[${index}]}
+        ${debit_tr}     Set Variable    ${debits[${index}]}
+        
+        Log To Console    \nActual Transaction Details From Jornal Entry Get:
+        Log To Console    Trans ID: ${trans_id_tr}
+        Log To Console    jrLine Dates: ${jlinesdate_tr}
+        Log To Console    Line ID: ${line_id_tr}
+        Log To Console    Credit: ${credit_tr}
+        Log To Console    Debit: ${debit_tr}
+        Log To Console    Debitlist : ${Debitlist}
+        Log To Console    Creditlist : ${Creditlist}
+
+        ########## Compare Excel Credit with credit Amount in Journal Entry ##########
+        FOR    ${credit}    IN    @{Creditlist}
+            ${credit_float}    Convert To Number    ${credit}    
+            ${credit_tr_float}    Convert To Number    ${credit_tr} 
+            IF  '${credit_float}' != '0.0'
+                IF  '${credit_tr_float}' != '0.0'
+                    # Convert credit_tr to float
+                    Log To Console        ifCreditssss:${credit_float} == ${credit_tr_float}
+                    FOR     ${Trdate}   IN  @{Transdatelist}
+                        IF    ${credit_float} == ${credit_tr_float}
+                            Log To Console  1St Condition credit ${credit_float} == ${credit_tr_float}
+                            IF  '${Trdate}' == '${jlinesdate_tr}'
+                                Log To Console    \nMatched -> Credit Transaction Exist ...
+                            END
+                        ELSE
+                            Log To Console    \nNot Matched ->Credit Transaction Not Found ...
+                        END
+                    END
                 END
+            END
+        END
+
+        # Compare debit_tr with Debitlist
+        FOR    ${debit}    IN    @{Debitlist}
+            ${debit_float}    Convert To Number    ${debit}    # Convert debit to float
+            ${debit_tr_float}    Convert To Number    ${debit_tr}    # Convert debit_tr to float
+            IF  '${debit_float}' != '0.0'
+                IF  '${debit_tr_float}' != '0.0'
+                    Log To Console        if Debits:${debit_float} == ${debit_tr_float}
+                    FOR     ${Trdate}   IN  @{Transdatelist}
+                        IF    ${debit_float} == ${debit_tr_float}
+                            Log To Console  1St Condition ${debit_float} == ${debit_tr_float}
+                            IF  '${Trdate}' == '${jlinesdate_tr}'
+                                Log To Console    \nMatched -> Debit Transaction Exist ...
+                            END
+                        ELSE
+                            Log To Console    \nNot Matched ->Debit Transaction Not Found ...
+                        END
+                    END
+                END
+            ELSE
+                Log To Console    \nNot Matched ->Debit Transaction Not Found ...
+            END
         END
     END
-        # Log To Console        Line IDs: ${line_ids}
-        # Log To Console       Credits: ${credits}
-        # Log To Console       Debits: ${debits}
 
-        # Log To Console       Debits: 
+
+    #####--- POST to Get The Reconciliation List --- #####
+    ${recon_post}    Set Variable         {"ExternalReconciliationFilterParams": {"AccountCodeFrom": "${rev_bank}","AccountCodeTo": "${rev_bank}","ReconciliationAccountType": "rat_GLAccount"}}
+    ${reconcile_get_response}    Post Request   ${sessionname}    ${base_url}/ExternalReconciliationsService_GetReconciliationList  data=${recon_post}  headers=${headers}
+    IF    ${reconcile_get_response.status_code} == 200
+        ${reconListdata}    Set Variable    ${reconcile_get_response.json()}
+        ${recListValueSet}  Set Variable    ${reconListdata['value']}
+        FOR    ${rec}    IN    @{reconListdata['value']}
+            FOR    ${key}    ${value}    IN    &{rec}
+                Set To Dictionary    ${get_reconciled_data}    ${key}    ${value}
+            END
+            ${get_rec_data}     Get Dictionary Items        ${get_reconciled_data}
+            ${recno}  Get From Dictionary    ${get_reconciled_data}    ReconciliationNo
+            Append To List    ${RecNumberlist}    ${recno} 
+        END
+        Log To Console      \nGet Reconciled Data-Success...
+        Log To Console      RecNumberlist:${RecNumberlist}
     ELSE
-        Log To Console      \nJournal Entry Get Failed...
-        Log To Console      \nJournalEntryResponse : \n${Journal_filter_data}
+        Log To Console      \nGet Reconciled Data- Failed...
+        Log To Console      \n JSON: ${reconcile_get_response.json()}
     END
-    # ${Dic_length}    Evaluate    len(${sorted_dict})
-    # Log To Console      \n Length: ${Dic_length}
-    # Log To Console      \n Line: ${sorted_dict['Line_ID']}
-    # FOR     ${Data}     IN     ${sorted_dict['Line_ID']}
-    #     Log To Console      \n Line: ${Data}
-    # END 
-    # FOR     ${s}    IN       @{sorted_dict}
-    #         Log To Console      ${s['Line_ID']}
-    # END
-    
+
+    #####--- POST to Get The Reconciliation Each complete data for compare IF Reconcieled Or Not  --- #####
+    ${jdtNums_rec_List}     Create List
+    FOR     ${recNum}   IN  @{RecNumberlist}
+        ${rec_data_body}    Set Variable    {"ExternalReconciliationParams": {"AccountCode": "${rev_bank}","ReconciliationNo": ${recNum}}}  
+        # Log To Console      \nrec_data_body: ${rec_data_body}
+        ${rec_data_body_get_response}    Post Request   ${sessionname}    ${base_url}/ExternalReconciliationsService_GetReconciliation  data=${rec_data_body}  headers=${headers}
+        IF    ${rec_data_body_get_response.status_code} == 200
+
+            ${single_rec_json}      Set Variable    ${rec_data_body_get_response.json()}
+            # Log To Console   \nRecGet Single :${single_rec_json}
+            ${rec_jentry_lines}     Set Variable    ${single_rec_json['ReconciliationJournalEntryLines']}
+            Log To Console   \nRecGet Single :${rec_jentry_lines}
+            FOR     ${singleTrans}  IN  @{rec_jentry_lines}
+                # Log To Console      Sets:${singleTrans}
+                # FOR     ${jdtNums_rec}    @{singleTrans}  
+                ${jdtNums_rec}      Set Variable    ${singleTrans['TransactionNumber']}
+                Append To List   ${jdtNums_rec_List}      ${jdtNums_rec} 
+            END
+            Log To Console  JJJJJJJJJJ: ${jdtNums_rec_List} 
+            # ${rec_bnk_lines}     Set Variable    ${single_rec_json['ReconciliationBankStatementLines']}
+            # Log To Console   \nRecGet Single :${rec_bnk_lines}
 
 
-
-
-
+        ELSE
+            Log To      Failed Each Record get
+        END
+    END
 
 
 
@@ -246,7 +351,6 @@ second page
         #             Log To Console    Response Val json: ${customer_response1.json()}\n  
         #         END
         # END
-
     #     # getting journal entries
     #     FOR    ${counter}    IN RANGE    0    ${list_length}
     #                 IF    ${TransIDlist}[${counter}] == 0   
@@ -261,7 +365,6 @@ second page
     #                     ELSE
     #                         Log To Console    failjournalentry
     #                     END
-                    
     #                 ELSE
     #                     ${customer_response}    Get Request    ${sessionname}    ${base_url}/JournalEntries(${TransIDlist}[${counter}])/JournalEntryLines
     #                         IF    ${customer_response.status_code} == 200
@@ -313,10 +416,7 @@ second page
     #         Log To Console      \nLineIdList: ${linidlist}\nTransId: ${TransIDlist}\nAccountCode: ${coded}\nSequenceList:${sequencelist}\n
     #     # posting external reconciliation
     #     posting ExternalReconciliation    ${linidlist}    ${TransIDlist}    ${coded}    ${sequencelist}  ${headers}     
-        
     # END
-
-
 # posting ExternalReconciliation 
 #     [Arguments]    ${linidlist}    ${TransIDlist}    ${coded}    ${sequencelist}    ${headers}  
 #     Log To Console      Line Id1: ${linidlist}[0],Line Id2:${linidlist}[1]
@@ -351,7 +451,6 @@ second page
 #             Set Cell Value  5   7     Value: ${ErrorMsg}
 #             Set Cell Format    5   7
 #             ...   wrap_text=True
-            
 #             Save Workbook
 #             Log To Console      Reconciliation Failed
 #         END
