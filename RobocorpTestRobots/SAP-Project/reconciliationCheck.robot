@@ -128,15 +128,6 @@ second page
 
 
 
-
-
-
-
-
-
-
-
-
 # ////////////////////////////////////////////////
     
 
@@ -144,8 +135,6 @@ second page
     ${customer_response}    Get Request    ${sessionname}    ${base_url}/JournalEntries?$filter=DueDate ge '${From_Date}' and DueDate le '${To_Date}'
     IF    ${customer_response.status_code} == 200
         ${Journal_filter_data}    Set Variable    ${customer_response.json()}
-                # Log To Console    \n\nData :::::${Journal_filter_data}
-
         ${line_ids}    Create List
         ${account_codes}    Create List
         ${credits}  Create List
@@ -155,11 +144,7 @@ second page
         ${JLine_DatesList}        Create List
         ${sorted_dict}      Create Dictionary 
         ${filtered_data}    Create Dictionary 
-        
-        # Log To Console      \nList : @{Journal_filter_data['value']['JournalEntryLines']}
         FOR    ${entry}    IN    @{Journal_filter_data['value']}
-            
-            # Log To Console      \nTransIds: ${Trans_Id}
             FOR    ${journal_line}    IN    @{entry['JournalEntryLines']}
                 FOR    ${key}    ${value}    IN    &{journal_line}
                     Set To Dictionary    ${sorted_dict}    ${key}    ${value}
@@ -186,24 +171,14 @@ second page
                 END 
             END
         END
-        # Log To Console      \nJournal Entry Get Details:
-        # Log To Console      Trans IDs: ${Trans_Ids}
-        # Log To Console      Due Dates: ${JLine_DatesList}
-        # Log To Console      Line IDs: ${line_ids}
-        # Log To Console      Credits: ${credits}
-        # Log To Console      Debits: ${debits}
         ${Dic_length}   Evaluate    len(@{line_ids})
-        # Log To Console      \n Length: ${Dic_length}
-        # Log To Console       Debits: 
         Log To Console      \nGet Journal Entry - Succes...
     ELSE
         Log To Console      \nGet Journal Entry - Failed...
-        # Log To Console      \nJournalEntryResponse : \n${Journal_filter_data}
     END
     Log To Console      \n LengthFinal: ${Dic_length}
     
 ######################### ^^^^Journal Entry Filtered^^^^ ########################
-
 
     ${journal_transaction_details_list}    Create List
     FOR    ${index}    IN RANGE    ${Dic_length}
@@ -220,13 +195,6 @@ second page
         Set To Dictionary    ${transaction_details}    Credit    ${credit_tr}
         Set To Dictionary    ${transaction_details}    Debit    ${debit_tr}
         
-        # Log To Console    \nActual Transaction Details From Journal Entry Get:
-        # Log To Console    Trans ID: ${trans_id_tr}
-        # Log To Console    jrLine Dates: ${jlinesdate_tr}
-        # Log To Console    Line ID: ${line_id_tr}
-        # Log To Console    Credit: ${credit_tr}
-        # Log To Console    Debit: ${debit_tr}
-        
         Append To List    ${journal_transaction_details_list}    ${transaction_details}
     END
 
@@ -236,122 +204,334 @@ second page
     Log To Console    \nExcelTransaction Details List: ${Excel_transaction_details_list}
 
     ${matching_records}    Create List
+    ${unmatched_records}    Create List
     FOR    ${excel_record}    IN    @{Excel_transaction_details_list}
         ${excel_credit}    Set Variable    ${excel_record}[Credit]
         ${excel_debit}    Set Variable    ${excel_record}[Debit]
         ${excel_date}    Set Variable    ${excel_record}[Date]
-        # Log To Console      \nExcdr:${excel_credit}
-        # Log To Console      Exdbr:${excel_debit}
-        # Log To Console      Exdate:${excel_date}
+        ${excel_details}    Set Variable    ${excel_record}[Details]
+        ${excel_reference}    Set Variable    ${excel_record}[RefNo]
         ${matching_record}    Set Variable    ${None}
-
+        ${unmatched_record}    Set Variable    ${None}
+        Log To Console          Matching Record Value ::::${matching_record}       
         FOR    ${journal_record}    IN    @{journal_transaction_details_list}
             ${journal_credit}    Set Variable    ${journal_record}[Credit]
             ${journal_debit}    Set Variable    ${journal_record}[Debit]
             ${journal_date}    Set Variable    ${journal_record}[jrLineDates]
-            # Log To Console      \nJcdr:${journal_credit}
-            # Log To Console      Jdr:${journal_debit}
-            # Log To Console      Jdate:${journal_date}
-            Log To Console      \nChecking '${excel_credit}' == '${journal_credit}' and '${excel_debit}' == '${journal_debit}' and '${excel_date}' == '${journal_date}'
-                Run Keyword If    '${excel_credit}' == '${journal_debit}' and '${excel_debit}' == '${journal_credit}' and '${excel_date}' == '${journal_date}' 
-                ...    Set Variable    ${matching_record}    ${journal_record}
-            Log To Console      matching recored:${matching_record}
-            IF    '${matching_record}' != '${None}'
-                ${trans_id}    Set Variable    ${matching_record}[TransID]
-                ${matching_dict}    Create Dictionary    TransID=${trans_id}    Debit=${excel_debit}    Credit=${excel_credit}
-                Append To List    ${matching_records}    ${matching_dict}
+            IF      '${excel_credit}' == '${journal_credit}'
+                IF      '${excel_date}' == '${journal_date}'
+                    ${matching_record}      Set Variable    ${journal_record}
+                    ${trans_id}    Set Variable    ${matching_record}[TransID]
+                    ${matching_dict}    Create Dictionary    TransID=${trans_id}    Debit=${excel_debit}    Credit=${excel_credit}      Details=${excel_details}           Date=${excel_date}       Reference=${excel_reference}
+                    Append To List    ${matching_records}    ${matching_dict}
+                END
+            ELSE
+                IF      '${excel_debit}' != '0.0'
+                    IF      '${excel_details}' == 'Bank Charge'
+                        ${unmatched_record}      Set Variable    ${excel_record}
+                        ${un_trans_id}    Set Variable    ${unmatched_record}[TransID]
+                        ${unmatching_dict}    Create Dictionary    TransID=${un_trans_id}    Debit=${excel_debit}    Credit=${excel_credit}    Details=${excel_details}     Date=${excel_date}      Reference=${excel_reference}
+                        Append To List    ${unmatched_records}    ${unmatching_dict}
+                    END
+                END
             END
         END
     END
-
-    # Log To Console    Matching Records: ${matching_records}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    ${New_Unmatched_List}   Create List
+    ${lenMatched}   Evaluate    len(${matching_records})
+    Log To Console    \nMatching Records: ${matching_records}       #Matchig record List
+    Log To Console    Matching Records Lenghth: ${lenMatched}
+    ${lenUnMatched}   Evaluate    len(${unmatched_records})
+    Log To Console    \nUnMatching Records: ${unmatched_records}
     
+
+    FOR    ${indexUnmatch}    IN RANGE    0    ${lenUnMatched}    3
+        ${New_unmatched}    Set Variable    ${unmatched_records[${indexUnmatch}]}
+        Append To List    ${New_Unmatched_List}    ${New_unmatched}
+    END
+    Log To Console      \nNew Unmatched Record: ${New_Unmatched_List}      #Unmatched recrod List
+    ${New_Unmatched_Len}   Evaluate    len(${New_Unmatched_List})
+    Log To Console    \nUnMatching Records: ${New_Unmatched_Len}
+
+
+
+
+
+
+
     #####--- POST to Get The Reconciliation List --- #####
-    ${recon_post}    Set Variable         {"ExternalReconciliationFilterParams": {"AccountCodeFrom": "${rev_bank}","AccountCodeTo": "${rev_bank}","ReconciliationAccountType": "rat_GLAccount"}}
-    ${reconcile_get_response}    Post Request   ${sessionname}    ${base_url}/ExternalReconciliationsService_GetReconciliationList  data=${recon_post}  headers=${headers}
-    IF    ${reconcile_get_response.status_code} == 200
-        ${reconListdata}    Set Variable    ${reconcile_get_response.json()}
-        ${recListValueSet}  Set Variable    ${reconListdata['value']}
-        FOR    ${rec}    IN    @{reconListdata['value']}
-            FOR    ${key}    ${value}    IN    &{rec}
-                Set To Dictionary    ${get_reconciled_data}    ${key}    ${value}
-            END
-            ${get_rec_data}     Get Dictionary Items        ${get_reconciled_data}
-            ${recno}  Get From Dictionary    ${get_reconciled_data}    ReconciliationNo
-            Append To List    ${RecNumberlist}    ${recno} 
-        END
-        Log To Console      \nGet Reconciled Data-Success...
-        Log To Console      RecNumberlist:${RecNumberlist}
-    ELSE
-        Log To Console      \nGet Reconciled Data- Failed...
-        Log To Console      \n JSON: ${reconcile_get_response.json()}
-    END
-    ${TransIdlenth}    Evaluate    len(${Trans_Ids})
-    Log To Console      Final TransId List: ${TransIdlenth}
-    IF    ${TransIdlenth} > 0
-        ${list_length}=    Evaluate    len(${TransIDlist})
-        Log To Console      \nTrans_Id List Length(From Excel) : ${list_length}
-        FOR    ${counter}    IN RANGE    0    ${list_length} 
-            IF    ${Excel_Debitlist}[${counter}] == 0
-                ${Ref_No}    Set Variable    ${Refnolist}[${counter}]
-                IF      '${Ref_No}' == '0'
-                    ${Ref_No}   Set Variable    null
-                ELSE
-                    ${Ref_No}   Set Variable    ${Ref_No}
+    ${matched_Ids_Un_rec}  Create List
+    IF      ${lenMatched} > 0
+        ${recon_post}    Set Variable         {"ExternalReconciliationFilterParams": {"AccountCodeFrom": "${rev_bank}","AccountCodeTo": "${rev_bank}","ReconciliationAccountType": "rat_GLAccount"}}
+        ${reconcile_get_response}    Post Request   ${sessionname}    ${base_url}/ExternalReconciliationsService_GetReconciliationList  data=${recon_post}  headers=${headers}
+        IF    ${reconcile_get_response.status_code} == 200
+            ${reconListdata}    Set Variable    ${reconcile_get_response.json()}
+            ${recListValueSet}  Set Variable    ${reconListdata['value']}
+            FOR    ${rec}    IN    @{reconListdata['value']}
+                FOR    ${key}    ${value}    IN    &{rec}
+                    Set To Dictionary    ${get_reconciled_data}    ${key}    ${value}
                 END
-                ${payload1}    Set Variable         {"AccountCode": "${rev_bank}", "CreditAmount": "${Excel_Creditlist}[${counter}]", "DocNumberType": "bpdt_DocNum", "Reference": "${Ref_No}","Memo":"${Detailslist}[${counter}]","DueDate":"${Transdatelist}[${counter}]"}
-                Log To Console      \nBank Page Post Body1:${payload1}
-            END   
-            IF    ${Excel_Debitlist}[${counter}] != 0
-                ${Ref_No}    Set Variable    ${Refnolist}[${counter}]
-                IF      '${Ref_No}' == '0'
-                    ${Ref_No}   Set Variable    null
-                ELSE
-                    ${Ref_No}   Set Variable    ${Ref_No}
-                END
-                ${payload1}     Set variable        {"AccountCode": "${rev_bank}", "DebitAmount": "${Excel_Debitlist}[${counter}]", "DocNumberType": "bpdt_DocNum", "Reference": ${Ref_No},"Memo":"${Detailslist}[${counter}]","DueDate":"${Transdatelist}[${counter}]"} 
-                Log To Console      Bank Page Post Body2:${payload1}
+                ${get_rec_data}     Get Dictionary Items        ${get_reconciled_data}
+                ${recno}  Get From Dictionary    ${get_reconciled_data}    ReconciliationNo
+                Append To List    ${RecNumberlist}    ${recno} 
             END
-            # ${response}=  Post Request  ${sessionname}    ${base_url}/BankPages  data=${payload1}  headers=${headers}
-            # IF    ${response.status_code} == 201
-            #     ${bankpage_response}    Set Variable    ${response.json()}
-            #     ${seqno}    Set Variable    ${bankpage_response['Sequence']}
-            #     Append To List    ${sequencelist}    ${seqno}
-            #     Log To Console    \nPOST BankPages:::::::::: - Success...
-            # ELSE
-            #     Log To Console    \nPOST BankPages:::::::::: - Failed...
-            # END
+            Log To Console      \nGet Reconciled Data-Success...
+            Log To Console      RecNumberlist:${RecNumberlist}          #Recon List 
+        ELSE
+            Log To Console      \nGet Reconciled Data- Failed...
+            Log To Console      \n JSON: ${reconcile_get_response.json()}
         END
-        Log To Console      \nSequenceList (From BankPages POST) :: ${sequencelist}
-        # ${response}=  Post Request  ${sessionname}    ${base_url}/ExternalReconciliationsService_Reconcile  data=${final_payload_string}  headers=${headers}
-        # IF    ${response.status_code} == 204
-        #     Log To Console  \nReconciliation Done Successfully..........
-        # ELSE            
-        #     Log To Console  \nReconciliation Failed..........
-        # END
+        
+        #####--- POST to Get The Reconciliation Each complete data for compare IF Reconcieled Or Not  --- #####
+        ${jdtNums_rec_List}     Create List
+        FOR     ${recNum}   IN  @{RecNumberlist}
+            ${rec_data_body}    Set Variable    {"ExternalReconciliationParams": {"AccountCode": "${rev_bank}","ReconciliationNo": ${recNum}}} 
+            ${rec_data_body_get_response}    Post Request   ${sessionname}    ${base_url}/ExternalReconciliationsService_GetReconciliation  data=${rec_data_body}  headers=${headers}
+            IF    ${rec_data_body_get_response.status_code} == 200
+                ${single_rec_json}      Set Variable    ${rec_data_body_get_response.json()}
+                ${rec_jentry_lines}     Set Variable    ${single_rec_json['ReconciliationJournalEntryLines']}
+                FOR     ${singleTrans}  IN  @{rec_jentry_lines}
+                    ${jdtNums_rec}      Set Variable    ${singleTrans['TransactionNumber']}
+                    Append To List   ${jdtNums_rec_List}      ${jdtNums_rec} 
+                END
+                FOR     ${arry1}    IN      @{Trans_Ids}
+                    FOR     ${arry2}    IN      @{jdtNums_rec_List}
+                        IF  '${arry1}' == '${arry2}'
+                            Log To Console  '${arry1}' == '${arry2}'
+                            Remove Values From List    ${Trans_Ids}    ${arry1}
+                        END 
+                    END
+                END
+                
+
+                Log To Console  Reconciled JDTNUMs\t\t: ${jdtNums_rec_List}
+                
+                
+
+                
+            ELSE
+                Log To Console      \nFailed Each Record get
+            END
+        END
     ELSE
-        Log To Console    \nNo Records 
+        Log To Console      \n There were no records found with the given transaction details....
     END
+    FOR    ${id}    IN    @{Trans_Ids}
+        Append To List    ${matched_Ids_Un_rec}    ${id}
+    END
+    Log To Console  UnReconciled transIdss\t\t: ${matched_Ids_Un_rec}
+    ${unRec_TransIdlenth}     Evaluate    len(${matched_Ids_Un_rec})
+    Log To Console  \nJournalEntry Get Lenth\t: ${unRec_TransIdlenth}
+    ${CreditMatchedList}     Create List
+    ${DebitMatchedList}     Create List
+    ${DetailsMatchedList}     Create List
+    ${DatesMatchedList}     Create List
+    ${referenceMatchedList}     Create List
+
+    ################# Matched
+    #===========================Credits
+
+    FOR     ${creditsMatched}    IN      @{matching_records} 
+        ${Credr}     Set Variable    ${creditsMatched['Credit']}
+        Append To List      ${CreditMatchedList}     ${Credr}
+    END
+
+    #===========================Debits
+
+    FOR     ${DebitsMatched}    IN      @{matching_records} 
+        ${matchdr}     Set Variable    ${DebitsMatched['Debit']}
+        Append To List      ${DebitMatchedList}     ${matchdr}
+    END
+
+    #===========================Details
+
+    FOR     ${detailsMatched}    IN      @{matching_records} 
+        ${detai}     Set Variable    ${detailsMatched['Details']}
+        Append To List      ${DetailsMatchedList}     ${detai}
+    END
+
+    #===========================Dates
+
+    FOR     ${datesMatched}    IN      @{matching_records} 
+        ${datee}     Set Variable    ${datesMatched['Date']}
+        Append To List      ${DatesMatchedList}     ${datee}
+    END
+
+    #===========================RefNos
+
+    FOR     ${RefsMatched}    IN      @{matching_records} 
+        ${reff}     Set Variable    ${RefsMatched['Reference']}
+        Append To List      ${referenceMatchedList}     ${reff}
+    END
+
+    #===========================
+    #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ${Credits_UnMatchedList}     Create List
+    ${Debits_UnMatchedList}     Create List
+    ${Details_UnMatchedList}     Create List
+    ${Dates_UnMatchedList}     Create List
+    ${reference_UnMatchedList}     Create List
+    ################# UnMatched   
+
+    #===========================Credits
+
+    FOR     ${CreditsunMatched}    IN      @{New_Unmatched_List} 
+        ${credun}     Set Variable    ${CreditsunMatched['Credit']}
+        Append To List      ${Credits_UnMatchedList}     ${credun}
+    END
+
+    #===========================Debits
+
+    FOR     ${DebitstsUnMatched}    IN      @{New_Unmatched_List} 
+        ${debr}     Set Variable    ${DebitstsUnMatched['Debit']}
+        Append To List      ${Debits_UnMatchedList}     ${debr}
+    END    
+
+    #===========================Details
+
+    FOR     ${DetailsUnMatched}    IN      @{New_Unmatched_List} 
+        ${detailsun}     Set Variable    ${DetailsUnMatched['Details']}
+        Append To List      ${Details_UnMatchedList}     ${detailsun}
+    END
+
+    #===========================Dates
+
+    FOR     ${DatesUnMatched}    IN      @{New_Unmatched_List} 
+        ${dateun}     Set Variable    ${DatesUnMatched['Date']}
+        Append To List      ${Dates_UnMatchedList}      ${dateun}
+    END
+
+    #===========================RefNos
+
+    FOR     ${RefsUnMatched}    IN      @{New_Unmatched_List} 
+        ${refun}     Set Variable    ${RefsUnMatched['Reference']}
+        Append To List      ${reference_UnMatchedList}     ${refun}
+    END
+
+
+
+
+    Log To Console      \nMatched records
+    Log To Console      Final Matched UnRec CreditsList\t:${CreditMatchedList}
+    Log To Console      Final Matched UnRec DebitsList\t:${DebitMatchedList}
+    Log To Console      Final Matched UnRec DetailsList\t:${DetailsMatchedList}
+    Log To Console      Final Matched UnRec DatesList\t:${DatesMatchedList}
+    Log To Console      Final Matched UnRec referenceList\t:${referenceMatchedList}
+
+    Log To Console      \nUnmatched records
+    Log To Console      DetailsList\t:${Details_UnMatchedList}
+    Log To Console      DatesList\t:${Dates_UnMatchedList}
+    Log To Console      referenceList\t:${reference_UnMatchedList}
+    Log To Console      CreditList\t:${Credits_UnMatchedList}
+    Log To Console      DebitsList\t:${Debits_UnMatchedList}
+
+
+    ${total_recs_toReconcile}       Set Variable        ${unRec_TransIdlenth+${New_Unmatched_Len}}
+    Log To Console      \nTotal Records To Reconcile: ${total_recs_toReconcile}
+    IF  ${total_recs_toReconcile}>0
+        FOR     ${counter}  IN RANGE    0   ${total_recs_toReconcile}
+            IF      ${unRec_TransIdlenth}>0
+                IF  ${counter} < ${unRec_TransIdlenth}
+                    IF    '${DebitMatchedList}[${counter}]' == '0.0'
+                        ${Ref_No}    Set Variable    ${referenceMatchedList}[${counter}]
+                        IF      '${Ref_No}' == '0'
+                            ${Ref_No}   Set Variable    null
+                        ELSE
+                            ${Ref_No}   Set Variable    ${Ref_No}
+                        END
+                        ${payload1}     Set variable        {"AccountCode": "${rev_bank}", "CreditAmount": "${CreditMatchedList}[${counter}]", "DocNumberType": "bpdt_DocNum", "Reference": ${Ref_No},"Memo":"${DetailsMatchedList}[${counter}]","DueDate":"${DatesMatchedList}[${counter}]"} 
+                        Log To Console      Bank Page Post Body1:${payload1}
+                        ${response}=  Post Request  ${sessionname}    ${base_url}/BankPages  data=${payload1}  headers=${headers}
+                        IF    ${response.status_code} == 201
+                            ${bankpage_response}    Set Variable    ${response.json()}
+                            ${seqno}    Set Variable    ${bankpage_response['Sequence']}
+                            Append To List    ${sequencelist}    ${seqno}
+                            Log To Console    \nPOST BankPages:::::::::: - Success...
+                        ELSE
+                            Log To Console    \nPOST BankPages:::::::::: - Failed...
+                        END
+                    END
+                END
+            END
+            IF  ${New_Unmatched_Len}>0
+                IF  ${counter} < ${New_Unmatched_Len}
+                    IF    '${Credits_UnMatchedList}[${counter}]' == '0.0'
+                        ${Ref_No}    Set Variable    ${reference_UnMatchedList}[${counter}]
+                        IF      '${Ref_No}' == '0'
+                            ${Ref_No}   Set Variable    null
+                        ELSE
+                            ${Ref_No}   Set Variable    ${Ref_No}
+                        END
+                        ${payload1}     Set variable        {"AccountCode": "${rev_bank}", "DebitAmount": "${Debits_UnMatchedList}[${counter}]", "DocNumberType": "bpdt_DocNum", "Reference": ${Ref_No},"Memo":"${Details_UnMatchedList}[${counter}]","DueDate":"${Dates_UnMatchedList}[${counter}]"} 
+                        Log To Console      Bank Page Post Body1:${payload1}
+                        ${response}=  Post Request  ${sessionname}    ${base_url}/BankPages  data=${payload1}  headers=${headers}
+                        IF    ${response.status_code} == 201
+                            ${bankpage_response}    Set Variable    ${response.json()}
+                            ${seqno}    Set Variable    ${bankpage_response['Sequence']}
+                            Append To List    ${sequencelist}    ${seqno}
+                            Log To Console    \nPOST BankPages:::::::::: - Success...
+                        ELSE
+                            Log To Console    \nPOST BankPages:::::::::: - Failed...
+                        END
+                    END
+                END
+            END
+        END
+    ELSE
+        Log To Console      \nNothing To reconsile........
+    END
+
+
+
+
+
+
+
+    #     #######====================================
+    #     ${line_number}    Set Variable    1
+    #     ${line_number}    Convert To Integer    ${line_number}
+    #     Log To Console      \nSequenceList: ${sequencelist}
+    #     ${highest_seqno}    Evaluate    max(${sequencelist})
+    #     Log To Console      \nhighest_value: ${highest_seqno}
+    #     ${highest_seqno}    Convert To Integer    ${highest_seqno}
+    #     ${reconciliation_lines}    Create List
+    #     ${bnkstmnt_lines}    Create List
+    #     FOR    ${T_Id}    IN    @{Trans_Ids}
+    #         ${reconciliation_line}    Create Dictionary    LineNumber=${line_number}    TransactionNumber=${T_Id}
+    #         Append To List    ${reconciliation_lines}    ${reconciliation_line}
+    #         ${line_number}    Set Variable    ${line_number + 1}
+    #         Log to Console    \n\nReconciliation_line: ${reconciliation_line}
+
+    #         ${bnkstmnt_line}    Create Dictionary    BankStatementAccountCode=${rev_bank}    Sequence=${highest_seqno}
+    #         Append To List    ${bnkstmnt_lines}    ${bnkstmnt_line}
+    #         # ${sequence_bnkpage}    Set Variable    ${sequence_bnkpage+1}
+    #         ${highest_seqno}    Set Variable    ${highest_seqno + 1}
+    #         Log to Console    \n\nbnkstmnt_line: ${bnkstmnt_line}
+    #     END
+
+    #     ${reconciliation_journal_entry_lines}    Evaluate    json.dumps(${reconciliation_lines})
+    #     ${reconciliation_bank_statement_lines}    Evaluate    json.dumps(${bnkstmnt_lines})
+
+    #     ${reconciliation_journal_entry_lines}    Set Variable    ${reconciliation_journal_entry_lines.replace('"[', '[').replace(']"', ']')}
+    #     ${reconciliation_bank_statement_lines}    Set Variable    ${reconciliation_bank_statement_lines.replace('"[', '[').replace(']"', ']')}
+
+    #     ${reconciliation_journal_entry_lines}    Set Variable    ${reconciliation_journal_entry_lines.replace('"\\[', '[').replace('\\]"', ']')}
+    #     ${reconciliation_bank_statement_lines}    Set Variable    ${reconciliation_bank_statement_lines.replace('"\\[', '[').replace('\\]"', ']')}
+
+    #     ${payload3}    Create Dictionary        ReconciliationAccountType=${datatype}    ReconciliationBankStatementLines=${reconciliation_bank_statement_lines}    ReconciliationJournalEntryLines=${reconciliation_journal_entry_lines}
+    #     ${final_payload}    Create Dictionary    ExternalReconciliation=${payload3}
+
+    #     ${final_payload_string}    Evaluate    json.dumps(${final_payload})
+
+    #     ${final_payload_string}    Set Variable    ${final_payload_string.replace('\\', '')}
+    #     ${final_payload_string}    Set Variable    ${final_payload_string.replace('"[', '[').replace(']"', ']')}
+
+    #     ${final_payload_string}    Set Variable    ${final_payload_string.replace('"\\[', '[').replace('\\]"', ']')}
     
-
-
+    # ELSE
+    #     Log To Console      \nNo Transactions To Reconcile......
+    # END
+    # Log To Console      Final List : ${final_payload_string}
 
 
 
@@ -505,3 +685,4 @@ second page
 #             Log To Console      Reconciliation Failed
 #         END
 #     END
+
