@@ -20,7 +20,7 @@ ${success_msg}      Reconciliation Success
 ${fail_msg}      Reconciliation Failure
 ${fail_msg2}       Record Not Found
 ${rev_bank}      161012
-${bank_charge_acc}      161012
+${bank_charge_paid}      650010
 ${line_ID}      0
 *** Tasks ***    
 main task 
@@ -425,6 +425,7 @@ second page
     Log To Console      CreditList\t:${Credits_UnMatchedList}
     Log To Console      DebitsList\t:${Debits_UnMatchedList}
 
+    ###############----------BankPage POST----------###############
 
     ${total_recs_toReconcile}       Set Variable        ${unRec_TransIdlenth+${New_Unmatched_Len}}
     Log To Console      \nTotal Records To Reconcile: ${total_recs_toReconcile}
@@ -480,58 +481,77 @@ second page
     ELSE
         Log To Console      \nNothing To reconsile........
     END
-
-
-
-
-
-
-
-    #     #######====================================
-    #     ${line_number}    Set Variable    1
-    #     ${line_number}    Convert To Integer    ${line_number}
-    #     Log To Console      \nSequenceList: ${sequencelist}
-    #     ${highest_seqno}    Evaluate    max(${sequencelist})
-    #     Log To Console      \nhighest_value: ${highest_seqno}
-    #     ${highest_seqno}    Convert To Integer    ${highest_seqno}
-    #     ${reconciliation_lines}    Create List
-    #     ${bnkstmnt_lines}    Create List
-    #     FOR    ${T_Id}    IN    @{Trans_Ids}
-    #         ${reconciliation_line}    Create Dictionary    LineNumber=${line_number}    TransactionNumber=${T_Id}
-    #         Append To List    ${reconciliation_lines}    ${reconciliation_line}
-    #         ${line_number}    Set Variable    ${line_number + 1}
-    #         Log to Console    \n\nReconciliation_line: ${reconciliation_line}
-
-    #         ${bnkstmnt_line}    Create Dictionary    BankStatementAccountCode=${rev_bank}    Sequence=${highest_seqno}
-    #         Append To List    ${bnkstmnt_lines}    ${bnkstmnt_line}
-    #         # ${sequence_bnkpage}    Set Variable    ${sequence_bnkpage+1}
-    #         ${highest_seqno}    Set Variable    ${highest_seqno + 1}
-    #         Log to Console    \n\nbnkstmnt_line: ${bnkstmnt_line}
-    #     END
-
-    #     ${reconciliation_journal_entry_lines}    Evaluate    json.dumps(${reconciliation_lines})
-    #     ${reconciliation_bank_statement_lines}    Evaluate    json.dumps(${bnkstmnt_lines})
-
-    #     ${reconciliation_journal_entry_lines}    Set Variable    ${reconciliation_journal_entry_lines.replace('"[', '[').replace(']"', ']')}
-    #     ${reconciliation_bank_statement_lines}    Set Variable    ${reconciliation_bank_statement_lines.replace('"[', '[').replace(']"', ']')}
-
-    #     ${reconciliation_journal_entry_lines}    Set Variable    ${reconciliation_journal_entry_lines.replace('"\\[', '[').replace('\\]"', ']')}
-    #     ${reconciliation_bank_statement_lines}    Set Variable    ${reconciliation_bank_statement_lines.replace('"\\[', '[').replace('\\]"', ']')}
-
-    #     ${payload3}    Create Dictionary        ReconciliationAccountType=${datatype}    ReconciliationBankStatementLines=${reconciliation_bank_statement_lines}    ReconciliationJournalEntryLines=${reconciliation_journal_entry_lines}
-    #     ${final_payload}    Create Dictionary    ExternalReconciliation=${payload3}
-
-    #     ${final_payload_string}    Evaluate    json.dumps(${final_payload})
-
-    #     ${final_payload_string}    Set Variable    ${final_payload_string.replace('\\', '')}
-    #     ${final_payload_string}    Set Variable    ${final_payload_string.replace('"[', '[').replace(']"', ']')}
-
-    #     ${final_payload_string}    Set Variable    ${final_payload_string.replace('"\\[', '[').replace('\\]"', ']')}
+    Log To Console      \nSequence List From BankPage : ${sequencelist}
+    ${bnk_page_seq_lenth}   Evaluate    len(${sequencelist})
+    Log To Console      \nSequence List From BankPage Length : ${bnk_page_seq_lenth}
+    Log To Console      \nUnMatched Length: ${New_Unmatched_Len}
     
-    # ELSE
-    #     Log To Console      \nNo Transactions To Reconcile......
-    # END
-    # Log To Console      Final List : ${final_payload_string}
+    ###############----------POST & GET Journal Entry Lines----------###############
+
+    IF      ${New_Unmatched_Len} > 0
+        FOR     ${indx}     IN RANGE    0   ${New_Unmatched_Len}
+            IF      ${indx} < ${New_Unmatched_Len}
+                ${PAYLOAD2}    Set Variable         {"JournalEntryLines": [{"AccountCode": "${rev_bank}","Credit": ${Credits_UnMatchedList}[${indx}],"Debit": ${Debits_UnMatchedList}[${indx}],"BPLID": 1},{"AccountCode": "${bank_charge_paid}","Credit": ${Debits_UnMatchedList}[${indx}],"Debit": ${Credits_UnMatchedList}[${indx}],"BPLID": 1}]}
+                ${response}=  Post Request  ${sessionname}    ${base_url}/JournalEntries  data=${PAYLOAD2}  headers=${headers}
+                IF    ${response.status_code} == 201
+                    Log To Console    \nSuccessjournalentry
+                ELSE
+                    Log To Console    \nFailjournalentry
+                END
+            END
+        END
+    END
+
+
+    ###############----------POST External Reconciliation----------###############
+
+    IF      ${bnk_page_seq_lenth} > 0
+        #######====================================
+        Log To Console      \nSequenceList: ${sequencelist}
+        ${reconciliation_lines}    Create List
+        ${bnkstmnt_lines}    Create List
+        FOR     ${count}    IN RANGE    0   ${bnk_page_seq_lenth}
+            ${reconciliation_line}    Create Dictionary    LineNumber=${count+1}    TransactionNumber=${matched_Ids_Un_rec}[${count}]
+            Append To List    ${reconciliation_lines}    ${reconciliation_line}
+            Log to Console    \n\nReconciliation_line: ${reconciliation_line}
+            ${bnkstmnt_line}    Create Dictionary    BankStatementAccountCode=${rev_bank}    Sequence=${sequencelist}[${count}]
+            Append To List    ${bnkstmnt_lines}    ${bnkstmnt_line}
+            Log to Console    \n\nbnkstmnt_line: ${bnkstmnt_line}
+        END
+
+        ${reconciliation_journal_entry_lines}    Evaluate    json.dumps(${reconciliation_lines})
+        ${reconciliation_bank_statement_lines}    Evaluate    json.dumps(${bnkstmnt_lines})
+
+        ${reconciliation_journal_entry_lines}    Set Variable    ${reconciliation_journal_entry_lines.replace('"[', '[').replace(']"', ']')}
+        ${reconciliation_bank_statement_lines}    Set Variable    ${reconciliation_bank_statement_lines.replace('"[', '[').replace(']"', ']')}
+
+        ${reconciliation_journal_entry_lines}    Set Variable    ${reconciliation_journal_entry_lines.replace('"\\[', '[').replace('\\]"', ']')}
+        ${reconciliation_bank_statement_lines}    Set Variable    ${reconciliation_bank_statement_lines.replace('"\\[', '[').replace('\\]"', ']')}
+
+        ${payload3}    Create Dictionary        ReconciliationAccountType=${datatype}    ReconciliationBankStatementLines=${reconciliation_bank_statement_lines}    ReconciliationJournalEntryLines=${reconciliation_journal_entry_lines}
+        ${final_payload}    Create Dictionary    ExternalReconciliation=${payload3}
+
+        ${final_payload_string}    Evaluate    json.dumps(${final_payload})
+
+        ${final_payload_string}    Set Variable    ${final_payload_string.replace('\\', '')}
+        ${final_payload_string}    Set Variable    ${final_payload_string.replace('"[', '[').replace(']"', ']')}
+
+        ${final_payload_string}    Set Variable    ${final_payload_string.replace('"\\[', '[').replace('\\]"', ']')}
+
+        Log To Console  \nFinal Body ExterNal ReconciliationService:\n ${final_payload_string}
+
+        # ${payload4}    Set Variable  {"ExternalReconciliation": {"ReconciliationAccountType": "${datatype}","ReconciliationBankStatementLines":[ {"BankStatementAccountCode": "${coded}","Sequence": ${sequencelist}[0]},{"BankStatementAccountCode": "${coded}","Sequence": ${sequencelist}[1]}],"ReconciliationJournalEntryLines":[{"LineNumber": ${linidlist}[0],"TransactionNumber": ${TransIDlist}[0]},{"LineNumber": ${linidlist}[1],"TransactionNumber": ${TransIDlist}[1]}]}}          
+        ${responseFinal}=  Post Request  ${sessionname}    ${base_url}/ExternalReconciliationsService_Reconcile  data=${final_payload_string}  headers=${headers}
+        IF    ${responseFinal.status_code} == 204
+            Log To Console      \nSuccess All
+        ELSE
+            Log To Console      \nFailed:\n${responseFinal.json()}
+        END
+
+
+
+    END
+
 
 
 
