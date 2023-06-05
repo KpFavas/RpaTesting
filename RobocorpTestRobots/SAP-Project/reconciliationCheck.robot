@@ -217,13 +217,16 @@ second page
         FOR    ${journal_record}    IN    @{journal_transaction_details_list}
             ${journal_credit}    Set Variable    ${journal_record}[Credit]
             ${journal_debit}    Set Variable    ${journal_record}[Debit]
+            ${journal_LineId}    Set Variable    ${journal_record}[LineID]
             ${journal_date}    Set Variable    ${journal_record}[jrLineDates]
             IF      '${excel_credit}' == '${journal_credit}'
-                IF      '${excel_date}' == '${journal_date}'
-                    ${matching_record}      Set Variable    ${journal_record}
-                    ${trans_id}    Set Variable    ${matching_record}[TransID]
-                    ${matching_dict}    Create Dictionary    TransID=${trans_id}    Debit=${excel_debit}    Credit=${excel_credit}      Details=${excel_details}           Date=${excel_date}       Reference=${excel_reference}
-                    Append To List    ${matching_records}    ${matching_dict}
+                IF      '${excel_credit}' != '0.0'
+                    IF      '${excel_date}' == '${journal_date}'
+                        ${matching_record}      Set Variable    ${journal_record}
+                        ${trans_id}    Set Variable    ${matching_record}[TransID]
+                        ${matching_dict}    Create Dictionary    TransID=${trans_id}    Debit=${excel_debit}    Credit=${excel_credit}      Details=${excel_details}           Date=${excel_date}       Reference=${excel_reference}        Line_ID=${journal_LineId}
+                        Append To List    ${matching_records}    ${matching_dict}
+                    END
                 END
             ELSE
                 IF      '${excel_debit}' != '0.0'
@@ -252,8 +255,6 @@ second page
     Log To Console      \nNew Unmatched Record: ${New_Unmatched_List}      #Unmatched recrod List
     ${New_Unmatched_Len}   Evaluate    len(${New_Unmatched_List})
     Log To Console    \nUnMatching Records: ${New_Unmatched_Len}
-
-
 
 
 
@@ -322,6 +323,7 @@ second page
     Log To Console  UnReconciled transIdss\t\t: ${matched_Ids_Un_rec}
     ${unRec_TransIdlenth}     Evaluate    len(${matched_Ids_Un_rec})
     Log To Console  \nJournalEntry Get Lenth\t: ${unRec_TransIdlenth}
+    ${LineIdsMatchedList}     Create List
     ${CreditMatchedList}     Create List
     ${DebitMatchedList}     Create List
     ${DetailsMatchedList}     Create List
@@ -329,6 +331,13 @@ second page
     ${referenceMatchedList}     Create List
 
     ################# Matched
+    #===========================LineId
+
+    FOR     ${LineIdMatched}    IN      @{matching_records} 
+        ${lineideach}     Set Variable    ${LineIdMatched['Line_ID']}
+        Append To List      ${LineIdsMatchedList}     ${lineideach}
+    END
+
     #===========================Credits
 
     FOR     ${creditsMatched}    IN      @{matching_records} 
@@ -412,6 +421,7 @@ second page
 
 
     Log To Console      \nMatched records
+    Log To Console      Final Matched UnRec LineIdList\t:${LineIdsMatchedList}
     Log To Console      Final Matched UnRec CreditsList\t:${CreditMatchedList}
     Log To Console      Final Matched UnRec DebitsList\t:${DebitMatchedList}
     Log To Console      Final Matched UnRec DetailsList\t:${DetailsMatchedList}
@@ -424,6 +434,12 @@ second page
     Log To Console      referenceList\t:${reference_UnMatchedList}
     Log To Console      CreditList\t:${Credits_UnMatchedList}
     Log To Console      DebitsList\t:${Debits_UnMatchedList}
+    ${DebitSum}     Evaluate    sum(${Debits_UnMatchedList})
+    Log To Console      \nSum::::::::::${DebitSum}
+    # FOR     ${drCount}      Integer     @{Debits_UnMatchedList}
+    # END
+
+    # Log To Console      DebitsList\t:${Debits_UnMatchedList}
 
     ###############----------BankPage POST----------###############
 
@@ -487,23 +503,40 @@ second page
     Log To Console      \nUnMatched Length: ${New_Unmatched_Len}
     
     ###############----------POST & GET Journal Entry Lines----------###############
-
+    ${JdtNumbsList}     Create List
+    # ${JlinesTransNumbersList}     Create List
+    ${JlinesList}     Create List
     IF      ${New_Unmatched_Len} > 0
-        FOR     ${indx}     IN RANGE    0   ${New_Unmatched_Len}
-            IF      ${indx} < ${New_Unmatched_Len}
-                ${PAYLOAD2}    Set Variable         {"JournalEntryLines": [{"AccountCode": "${rev_bank}","Credit": ${Credits_UnMatchedList}[${indx}],"Debit": ${Debits_UnMatchedList}[${indx}],"BPLID": 1},{"AccountCode": "${bank_charge_paid}","Credit": ${Debits_UnMatchedList}[${indx}],"Debit": ${Credits_UnMatchedList}[${indx}],"BPLID": 1}]}
-                ${response}=  Post Request  ${sessionname}    ${base_url}/JournalEntries  data=${PAYLOAD2}  headers=${headers}
-                IF    ${response.status_code} == 201
-                    Log To Console    \nSuccessjournalentry
-                ELSE
-                    Log To Console    \nFailjournalentry
-                END
-            END
+        ${PAYLOAD2}    Set Variable         {"JournalEntryLines": [{"AccountCode": "${rev_bank}","Credit": ${DebitSum},"Debit": 0.0,"BPLID": 1},{"AccountCode": "${bank_charge_paid}","Credit": 0.0,"Debit": ${DebitSum},"BPLID": 1}]}
+        Log To Console      \nPOST PayloadJlines: ${PAYLOAD2}
+        ${responseJEntry}=  Post Request  ${sessionname}    ${base_url}/JournalEntries  data=${PAYLOAD2}  headers=${headers}
+        IF    ${responseJEntry.status_code} == 201
+            ${JEntrypostResponseBody}       Set Variable        ${responseJEntry.json()}
+            ${JdtNumberss}       Set Variable        ${JEntrypostResponseBody['JdtNum']}
+            ${Jlines}       Set Variable        ${JEntrypostResponseBody['JournalEntryLines']}
+            Append To List      ${JlinesList}     ${Jlines}
+            Append To List      ${JdtNumbsList}     ${JdtNumberss}
+            Log To Console    \nSuccessjournalentry
+        ELSE
+            Log To Console    \nFailjournalentry
         END
     END
 
 
-    ###############----------POST External Reconciliation----------###############
+
+    # Log To Console     \nGetting JlinesList :::::::: ${JlinesList} 
+    Log To Console     \nGetting tans_Idddddd :::::::: ${JdtNumbsList} 
+    
+    ${JdtNumbsListLength}       Evaluate        len(${JdtNumbsList})
+    Log To Console      \nnPostJentryLengthIds:${JdtNumbsListLength}
+
+    ${mixed_JdtNum_list}    Create List    @{JdtNumbsList}    @{matched_Ids_Un_rec}
+    ${mixed_JdtNum_list_Length}     Evaluate    len(${mixed_JdtNum_list})
+    log To Console      \nMixedID List::${mixed_JdtNum_list}
+    log To Console      \nMixedID List Length::${mixed_JdtNum_list_Length}
+
+
+    ##############----------POST External Reconciliation----------###############
 
     IF      ${bnk_page_seq_lenth} > 0
         #######====================================
@@ -511,12 +544,21 @@ second page
         ${reconciliation_lines}    Create List
         ${bnkstmnt_lines}    Create List
         FOR     ${count}    IN RANGE    0   ${bnk_page_seq_lenth}
-            ${reconciliation_line}    Create Dictionary    LineNumber=${count+1}    TransactionNumber=${matched_Ids_Un_rec}[${count}]
-            Append To List    ${reconciliation_lines}    ${reconciliation_line}
-            Log to Console    \n\nReconciliation_line: ${reconciliation_line}
-            ${bnkstmnt_line}    Create Dictionary    BankStatementAccountCode=${rev_bank}    Sequence=${sequencelist}[${count}]
+            ${bnkstmnt_line}    Create Dictionary    BankStatementAccountCode=${rev_bank}    Sequence=${sequencelist}[${count}]     #Ok
             Append To List    ${bnkstmnt_lines}    ${bnkstmnt_line}
             Log to Console    \n\nbnkstmnt_line: ${bnkstmnt_line}
+        END
+
+        FOR     ${TrCount}      IN RANGE    0     ${unRec_TransIdlenth }
+            # matched_Ids_Un_rec
+            ${reconciliation_line}    Create Dictionary    LineNumber=${LineIdsMatchedList}[${TrCount}]    TransactionNumber=${matched_Ids_Un_rec}[${TrCount}]
+            Append To List    ${reconciliation_lines}    ${reconciliation_line}
+            Log to Console    \n\nReconciliation_line: ${reconciliation_line}
+        END
+        IF      ${JdtNumbsListLength} == 1
+            ${reconciliation_line}    Create Dictionary    LineNumber=0    TransactionNumber=${JdtNumbsList}[0]
+            Append To List    ${reconciliation_lines}    ${reconciliation_line}
+            Log to Console    \n\nReconciliation_line: ${reconciliation_line}
         END
 
         ${reconciliation_journal_entry_lines}    Evaluate    json.dumps(${reconciliation_lines})
@@ -547,9 +589,6 @@ second page
         ELSE
             Log To Console      \nFailed:\n${responseFinal.json()}
         END
-
-
-
     END
 
 
