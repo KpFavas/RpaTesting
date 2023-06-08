@@ -578,8 +578,33 @@ second page
         ${responseFinal}=  Post Request  ${sessionname}    ${base_url}/ExternalReconciliationsService_Reconcile  data=${final_payload_string}  headers=${headers}
         IF    ${responseFinal.status_code} == 204
             Log To Console      \nSuccess All
+            Open Workbook    ${url}
+            Set Active Worksheet    Sheet1
+            Set Styles    G6:G9
+            ...  color=ffffff
+            ...  align_horizontal=center
+            ...  align_vertical=center
+            ...  bold=True
+            ...  cell_fill=198754
+            Set Cell Value  7   7     ${success_msg}
+            Save Workbook
+            Log To Console    \nReconciliation Success 
         ELSE
-            Log To Console      \nFailed:\n${responseFinal.json()}
+            ${ErrorMsg}     Set Variable    ${response.json()['error']['message']['value']}
+            Open Workbook    ${url}
+            Set Active Worksheet    Sheet1
+            Set Styles    G6:G9
+            ...  color=ffffff
+            ...  align_horizontal=center
+            ...  align_vertical=center
+            ...  bold=True
+            ...  cell_fill=DC143C
+            Set Cell Value  6   7     ${fail_msg}
+            Set Cell Value  7   7     Value: ${ErrorMsg}
+            Set Cell Format    7   7
+            ...   wrap_text=True
+            Save Workbook
+            Log To Console      Reconciliation Failed
         END
     END
 
