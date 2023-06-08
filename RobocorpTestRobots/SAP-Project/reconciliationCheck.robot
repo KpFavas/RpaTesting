@@ -303,13 +303,7 @@ second page
                         END 
                     END
                 END
-                
-
                 Log To Console  Reconciled JDTNUMs\t\t: ${jdtNums_rec_List}
-                
-                
-
-                
             ELSE
                 Log To Console      \nFailed Each Record get
             END
@@ -416,8 +410,6 @@ second page
         ${refun}     Set Variable    ${RefsUnMatched['Reference']}
         Append To List      ${reference_UnMatchedList}     ${refun}
     END
-
-
 
 
     Log To Console      \nMatched records
