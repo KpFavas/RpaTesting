@@ -8,8 +8,8 @@ Library     DateTime
 Library     RPA.Browser.Selenium
 Library     JSONLibrary
 *** Variables ***
-${base_url}    http://151.80.190.234:50001/b1s/v1
-${username}    {"CompanyDB": "SBODemoGB","UserName": "favas"}
+${base_url}    http://116.74.253.177:50001/b1s/v1
+${username}    {"CompanyDB": "SBODemoIN","UserName": "favas"}
 ${password}    Test@123
 ${sessionname}    sapb
 ${url}          ${OUTPUT_DIR}${/}/OBNK-Sheet.xlsx
