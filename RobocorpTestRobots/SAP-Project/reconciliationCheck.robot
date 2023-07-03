@@ -205,7 +205,7 @@ second page
     Log To Console    \nJLinesTransaction Details List: ${journal_transaction_details_list}
     Log To Console    \nExcelTransaction Details List: ${Excel_transaction_details_list}
 
-    ${matching_records}    Create List
+    ${matching_records}    Create List 
     ${unmatched_records}    Create List
     FOR    ${excel_record}    IN    @{Excel_transaction_details_list}
         ${excel_credit}    Set Variable    ${excel_record}[Credit]
