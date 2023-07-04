@@ -145,7 +145,7 @@ second page
         ${Trans_Ids}        Create List
         ${JLine_DatesList}        Create List
         ${sorted_dict}      Create Dictionary 
-        ${filtered_data}    Create Dictionary 
+        ${filtered_data}    Create Dictionary  
         FOR    ${entry}    IN    @{Journal_filter_data['value']}
             FOR    ${journal_line}    IN    @{entry['JournalEntryLines']}
                 FOR    ${key}    ${value}    IN    &{journal_line}
