@@ -284,7 +284,7 @@ second page
     ${JL}    Create List    1    2    3    4    5
     ${EX}    Create List    1    2    6    7
     ${UnMatched}    Create List
-    ${Matched}    Create List
+    ${Matched}    Create List 
 
     FOR    ${element}    IN    @{EX}
         ${is_matched}    Set Variable    ${False}
