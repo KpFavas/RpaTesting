@@ -222,14 +222,13 @@ second page
             ${journal_debit}    Set Variable    ${journal_record}[Debit]
             ${journal_LineId}    Set Variable    ${journal_record}[LineID]
             ${journal_date}    Set Variable    ${journal_record}[jrLineDates]
-
             IF    '${excel_credit}' == '${journal_credit}' and '${excel_credit}' != '0.0' and '${excel_date}' == '${journal_date}'
                 ${is_matched}    Set Variable    ${True}
                 ${matching_record}    Set Variable    ${journal_record}
                 ${trans_id}    Set Variable    ${matching_record}[TransID]
                 ${matching_dict}    Create Dictionary    TransID=${trans_id}    Debit=${excel_debit}    Credit=${excel_credit}    Details=${excel_details}    Date=${excel_date}    Reference=${excel_reference}    Line_ID=${journal_LineId}
                 Append To List    ${matching_records}    ${matching_dict}
-                Exit For Loop
+                Exit For Loop       #To Exit the loop
             END
         END
         IF    not ${is_matched}
@@ -249,7 +248,6 @@ second page
     Log To Console      \nNew Unmatched Record: ${unmatched_records}      #Unmatched recrod List
     ${New_Unmatched_Len}   Evaluate    len(${unmatched_records})
     Log To Console    \nUnMatching Records: ${New_Unmatched_Len}
-
 
     #####--- POST to Get The Reconciliation List --- #####
     ${matched_Ids_Un_rec}  Create List
@@ -405,7 +403,7 @@ second page
     #===========================RefNos
 
     FOR     ${RefsUnMatched}    IN      @{unmatched_records} 
-        ${refun}     Set Variable    ${RefsUnMatched['Reference']}
+        ${refun}     Set Variable    ${RefsUnMatched['RefNo']}
         Append To List      ${reference_UnMatchedList}     ${refun}
     END
 
