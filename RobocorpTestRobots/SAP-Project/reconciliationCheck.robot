@@ -438,7 +438,7 @@ second page
     Log To Console      CreditList\t:${Credits_UnMatchedList}
     Log To Console      DebitsList\t:${Debits_UnMatchedList}
     ${DebitSum}     Evaluate    sum(${Debits_UnMatchedList})
-    Log To Console      \nSum::::::::::${DebitSum}
+    Log To Console      \nSum::::::::::${DebitSum} 
 
     ###############----------BankPage POST----------###############
     Log To Console      \nChecking:::::::::TransIDLEngthMatchedCount:${Matched_UnRec_TransIds_Length}
