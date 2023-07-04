@@ -259,16 +259,22 @@ second page
             ${journal_LineId}    Set Variable    ${journal_transaction_details_list[${journal_record}]}[LineID]
             ${journal_date}    Set Variable    ${journal_transaction_details_list[${journal_record}]}[jrLineDates] 
             # IF     
-            Run Keyword If    '${excel_credit}' == '${journal_credit}'  and     '${excel_credit}' != '0.0'  and  '${excel_date}' == '${journal_date}'
-                ${matching_record}      Set Variable    ${journal_transaction_details_list[${journal_record}]}
-                ${trans_id}    Set Variable    ${matching_record}[TransID]
-                ${matching_dict}    Create Dictionary    TransID=${trans_id}    Debit=${excel_debit}    Credit=${excel_credit}      Details=${excel_details}           Date=${excel_date}       Reference=${excel_reference}        Line_ID=${journal_LineId}
-                Append To List    ${matching_records}    ${matching_dict}
-            ...    ELSE IF    '${excel_debit}' != '0.0'
-                ${unmatched_record}      Set Variable    ${Excel_transaction_details_list[${excelRec}]}
-                ${un_trans_id}    Set Variable    ${unmatched_record}[TransID]
-                ${unmatching_dict}    Create Dictionary    TransID=${un_trans_id}    Debit=${excel_debit}    Credit=${excel_credit}    Details=${excel_details}     Date=${excel_date}      Reference=${excel_reference}
-                Append To List    ${unmatched_records}    ${unmatching_dict}
+            If      '${excel_credit}' == '${journal_credit}'
+                IF  '${excel_credit}' != '0.0'   
+                    IF  '${excel_date}' == '${journal_date}'
+                        ${matching_record}      Set Variable    ${journal_transaction_details_list[${journal_record}]}
+                        ${trans_id}    Set Variable    ${matching_record}[TransID]
+                        ${matching_dict}    Create Dictionary    TransID=${trans_id}    Debit=${excel_debit}    Credit=${excel_credit}      Details=${excel_details}           Date=${excel_date}       Reference=${excel_reference}        Line_ID=${journal_LineId}
+                        Append To List    ${matching_records}    ${matching_dict}
+                    END
+                END
+            ELSE 
+                IF    '${excel_debit}' != '0.0'
+                    ${unmatched_record}      Set Variable    ${Excel_transaction_details_list[${excelRec}]}
+                    ${un_trans_id}    Set Variable    ${unmatched_record}[TransID]
+                    ${unmatching_dict}    Create Dictionary    TransID=${un_trans_id}    Debit=${excel_debit}    Credit=${excel_credit}    Details=${excel_details}     Date=${excel_date}      Reference=${excel_reference}
+                    Append To List    ${unmatched_records}    ${unmatching_dict}
+                END
             END
         END
     END
