@@ -583,7 +583,7 @@ second page
             Save Workbook
             Log To Console    \nReconciliation Success 
         ELSE
-            ${ErrorMsg}     Set Variable    ${response.json()['error']['message']['value']}
+            ${ErrorMsg}     Set Variable    ${responseFinal.json()['error']['message']['value']}
             Open Workbook    ${url}
             Set Active Worksheet    Sheet1
             Set Styles    G6:G9
