@@ -385,35 +385,35 @@ second page
 
     #===========================Credits
 
-    FOR     ${CreditsunMatched}    IN      @{New_Unmatched_List} 
+    FOR     ${CreditsunMatched}    IN      @{unmatched_records} 
         ${credun}     Set Variable    ${CreditsunMatched['Credit']}
         Append To List      ${Credits_UnMatchedList}     ${credun}
     END
 
     #===========================Debits
 
-    FOR     ${DebitstsUnMatched}    IN      @{New_Unmatched_List} 
+    FOR     ${DebitstsUnMatched}    IN      @{unmatched_records} 
         ${debr}     Set Variable    ${DebitstsUnMatched['Debit']}
         Append To List      ${Debits_UnMatchedList}     ${debr}
     END    
 
     #===========================Details
 
-    FOR     ${DetailsUnMatched}    IN      @{New_Unmatched_List} 
+    FOR     ${DetailsUnMatched}    IN      @{unmatched_records} 
         ${detailsun}     Set Variable    ${DetailsUnMatched['Details']}
         Append To List      ${Details_UnMatchedList}     ${detailsun}
     END
 
     #===========================Dates
 
-    FOR     ${DatesUnMatched}    IN      @{New_Unmatched_List} 
+    FOR     ${DatesUnMatched}    IN      @{unmatched_records} 
         ${dateun}     Set Variable    ${DatesUnMatched['Date']}
         Append To List      ${Dates_UnMatchedList}      ${dateun}
     END
 
     #===========================RefNos
 
-    FOR     ${RefsUnMatched}    IN      @{New_Unmatched_List} 
+    FOR     ${RefsUnMatched}    IN      @{unmatched_records} 
         ${refun}     Set Variable    ${RefsUnMatched['Reference']}
         Append To List      ${reference_UnMatchedList}     ${refun}
     END
