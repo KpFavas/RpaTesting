@@ -459,15 +459,15 @@ second page
                         END
                         ${payload1}     Set variable        {"AccountCode": "${rev_bank}", "CreditAmount": "${CreditMatchedList}[${counter}]", "DocNumberType": "bpdt_DocNum", "Reference": ${Ref_No},"Memo":"${DetailsMatchedList}[${counter}]","DueDate":"${DatesMatchedList}[${counter}]"} 
                         Log To Console      Bank Page Post Body1:${payload1}
-                        # ${response}=  Post Request  ${sessionname}    ${base_url}/BankPages  data=${payload1}  headers=${headers}
-                        # IF    ${response.status_code} == 201
-                        #     ${bankpage_response}    Set Variable    ${response.json()}
-                        #     ${seqno}    Set Variable    ${bankpage_response['Sequence']}
-                        #     Append To List    ${sequencelist}    ${seqno}
-                        #     Log To Console    \nPOST BankPages:::::::::: - Success...
-                        # ELSE
-                        #     Log To Console    \nPOST BankPages:::::::::: - Failed...
-                        # END
+                        ${response}=  Post Request  ${sessionname}    ${base_url}/BankPages  data=${payload1}  headers=${headers}
+                        IF    ${response.status_code} == 201
+                            ${bankpage_response}    Set Variable    ${response.json()}
+                            ${seqno}    Set Variable    ${bankpage_response['Sequence']}
+                            Append To List    ${sequencelist}    ${seqno}
+                            Log To Console    \nPOST BankPages:::::::::: - Success...
+                        ELSE
+                            Log To Console    \nPOST BankPages:::::::::: - Failed...
+                        END
                     END
                 END
             END
@@ -482,15 +482,15 @@ second page
                         END
                         ${payload1}     Set variable        {"AccountCode": "${rev_bank}", "DebitAmount": "${Debits_UnMatchedList}[${counter}]", "DocNumberType": "bpdt_DocNum", "Reference": ${Ref_No},"Memo":"${Details_UnMatchedList}[${counter}]","DueDate":"${Dates_UnMatchedList}[${counter}]"} 
                         Log To Console      Bank Page Post Body1:${payload1}
-                        # ${response}=  Post Request  ${sessionname}    ${base_url}/BankPages  data=${payload1}  headers=${headers}
-                        # IF    ${response.status_code} == 201
-                        #     ${bankpage_response}    Set Variable    ${response.json()}
-                        #     ${seqno}    Set Variable    ${bankpage_response['Sequence']}
-                        #     Append To List    ${sequencelist}    ${seqno}
-                        #     Log To Console    \nPOST BankPages:::::::::: - Success...
-                        # ELSE
-                        #     Log To Console    \nPOST BankPages:::::::::: - Failed...
-                        # END
+                        ${response}=  Post Request  ${sessionname}    ${base_url}/BankPages  data=${payload1}  headers=${headers}
+                        IF    ${response.status_code} == 201
+                            ${bankpage_response}    Set Variable    ${response.json()}
+                            ${seqno}    Set Variable    ${bankpage_response['Sequence']}
+                            Append To List    ${sequencelist}    ${seqno}
+                            Log To Console    \nPOST BankPages:::::::::: - Success...
+                        ELSE
+                            Log To Console    \nPOST BankPages:::::::::: - Failed...
+                        END
                     END
                 END
             END
@@ -504,112 +504,112 @@ second page
     Log To Console      \nUnMatched Length: ${New_Unmatched_Len}
     
     ###############----------POST & GET Journal Entry Lines----------###############
-    # ${JdtNumbsList}     Create List
-    # # ${JlinesTransNumbersList}     Create List
-    # ${JlinesList}     Create List
-    # IF      ${New_Unmatched_Len} > 0
-    #     ${PAYLOAD2}    Set Variable         {"JournalEntryLines": [{"AccountCode": "${rev_bank}","Credit": ${DebitSum},"Debit": 0.0,"BPLID": 1},{"AccountCode": "${bank_charge_paid}","Credit": 0.0,"Debit": ${DebitSum},"BPLID": 1}]}
-    #     Log To Console      \nPOST PayloadJlines: ${PAYLOAD2}
-    #     ${responseJEntry}=  Post Request  ${sessionname}    ${base_url}/JournalEntries  data=${PAYLOAD2}  headers=${headers}
-    #     IF    ${responseJEntry.status_code} == 201
-    #         ${JEntrypostResponseBody}       Set Variable        ${responseJEntry.json()}
-    #         ${JdtNumberss}       Set Variable        ${JEntrypostResponseBody['JdtNum']}
-    #         ${Jlines}       Set Variable        ${JEntrypostResponseBody['JournalEntryLines']}
-    #         Append To List      ${JlinesList}     ${Jlines}
-    #         Append To List      ${JdtNumbsList}     ${JdtNumberss}
-    #         Log To Console    \nSuccessjournalentry
-    #     ELSE
-    #         Log To Console    \nFailjournalentry
-    #     END
-    # END
+    ${JdtNumbsList}     Create List
+    # ${JlinesTransNumbersList}     Create List
+    ${JlinesList}     Create List
+    IF      ${New_Unmatched_Len} > 0
+        ${PAYLOAD2}    Set Variable         {"JournalEntryLines": [{"AccountCode": "${rev_bank}","Credit": ${DebitSum},"Debit": 0.0,"BPLID": 1},{"AccountCode": "${bank_charge_paid}","Credit": 0.0,"Debit": ${DebitSum},"BPLID": 1}]}
+        Log To Console      \nPOST PayloadJlines: ${PAYLOAD2}
+        ${responseJEntry}=  Post Request  ${sessionname}    ${base_url}/JournalEntries  data=${PAYLOAD2}  headers=${headers}
+        IF    ${responseJEntry.status_code} == 201
+            ${JEntrypostResponseBody}       Set Variable        ${responseJEntry.json()}
+            ${JdtNumberss}       Set Variable        ${JEntrypostResponseBody['JdtNum']}
+            ${Jlines}       Set Variable        ${JEntrypostResponseBody['JournalEntryLines']}
+            Append To List      ${JlinesList}     ${Jlines}
+            Append To List      ${JdtNumbsList}     ${JdtNumberss}
+            Log To Console    \nSuccessjournalentry
+        ELSE
+            Log To Console    \nFailjournalentry
+        END
+    END
 
-    # # Log To Console     \nGetting JlinesList :::::::: ${JlinesList} 
-    # Log To Console     \nGetting tans_Idddddd :::::::: ${JdtNumbsList} 
+    # Log To Console     \nGetting JlinesList :::::::: ${JlinesList} 
+    Log To Console     \nGetting tans_Idddddd :::::::: ${JdtNumbsList} 
     
-    # ${JdtNumbsListLength}       Evaluate        len(${JdtNumbsList})
-    # Log To Console      \nnPostJentryLengthIds:${JdtNumbsListLength}
+    ${JdtNumbsListLength}       Evaluate        len(${JdtNumbsList})
+    Log To Console      \nnPostJentryLengthIds:${JdtNumbsListLength}
 
-    # ${mixed_JdtNum_list}    Create List    @{JdtNumbsList}    @{matched_Ids_Un_rec}
-    # ${mixed_JdtNum_list_Length}     Evaluate    len(${mixed_JdtNum_list})
-    # log To Console      \nMixedID List::${mixed_JdtNum_list}
-    # log To Console      \nMixedID List Length::${mixed_JdtNum_list_Length}
+    ${mixed_JdtNum_list}    Create List    @{JdtNumbsList}    @{matched_Ids_Un_rec}
+    ${mixed_JdtNum_list_Length}     Evaluate    len(${mixed_JdtNum_list})
+    log To Console      \nMixedID List::${mixed_JdtNum_list}
+    log To Console      \nMixedID List Length::${mixed_JdtNum_list_Length}
 
 
-    # ##############----------POST External Reconciliation----------###############
+    ##############----------POST External Reconciliation----------###############
 
-    # IF      ${bnk_page_seq_lenth} > 0
-    #     #######====================================
-    #     Log To Console      \nSequenceList: ${sequencelist}
-    #     ${reconciliation_lines}    Create List
-    #     ${bnkstmnt_lines}    Create List
-    #     FOR     ${count}    IN RANGE    0   ${bnk_page_seq_lenth}
-    #         ${bnkstmnt_line}    Create Dictionary    BankStatementAccountCode=${rev_bank}    Sequence=${sequencelist}[${count}]     #Ok
-    #         Append To List    ${bnkstmnt_lines}    ${bnkstmnt_line}
-    #         Log to Console    \n\nbnkstmnt_line: ${bnkstmnt_line}
-    #     END
+    IF      ${bnk_page_seq_lenth} > 0
+        #######====================================
+        Log To Console      \nSequenceList: ${sequencelist}
+        ${reconciliation_lines}    Create List
+        ${bnkstmnt_lines}    Create List
+        FOR     ${count}    IN RANGE    0   ${bnk_page_seq_lenth}
+            ${bnkstmnt_line}    Create Dictionary    BankStatementAccountCode=${rev_bank}    Sequence=${sequencelist}[${count}]     #Ok
+            Append To List    ${bnkstmnt_lines}    ${bnkstmnt_line}
+            Log to Console    \n\nbnkstmnt_line: ${bnkstmnt_line}
+        END
 
-    #     FOR     ${TrCount}      IN RANGE    0     ${unRec_TransIdlenth }
-    #         # matched_Ids_Un_rec
-    #         ${reconciliation_line}    Create Dictionary    LineNumber=${LineIdsMatchedList}[${TrCount}]    TransactionNumber=${matched_Ids_Un_rec}[${TrCount}]
-    #         Append To List    ${reconciliation_lines}    ${reconciliation_line}
-    #         Log to Console    \n\nReconciliation_line: ${reconciliation_line}
-    #     END
-    #     IF      ${JdtNumbsListLength} == 1
-    #         ${reconciliation_line}    Create Dictionary    LineNumber=0    TransactionNumber=${JdtNumbsList}[0]
-    #         Append To List    ${reconciliation_lines}    ${reconciliation_line}
-    #         Log to Console    \n\nReconciliation_line: ${reconciliation_line}
-    #     END
+        FOR     ${TrCount}      IN RANGE    0     ${unRec_TransIdlenth }
+            # matched_Ids_Un_rec
+            ${reconciliation_line}    Create Dictionary    LineNumber=${LineIdsMatchedList}[${TrCount}]    TransactionNumber=${matched_Ids_Un_rec}[${TrCount}]
+            Append To List    ${reconciliation_lines}    ${reconciliation_line}
+            Log to Console    \n\nReconciliation_line: ${reconciliation_line}
+        END
+        IF      ${JdtNumbsListLength} == 1
+            ${reconciliation_line}    Create Dictionary    LineNumber=0    TransactionNumber=${JdtNumbsList}[0]
+            Append To List    ${reconciliation_lines}    ${reconciliation_line}
+            Log to Console    \n\nReconciliation_line: ${reconciliation_line}
+        END
 
-    #     ${reconciliation_journal_entry_lines}    Evaluate    json.dumps(${reconciliation_lines})
-    #     ${reconciliation_bank_statement_lines}    Evaluate    json.dumps(${bnkstmnt_lines})
+        ${reconciliation_journal_entry_lines}    Evaluate    json.dumps(${reconciliation_lines})
+        ${reconciliation_bank_statement_lines}    Evaluate    json.dumps(${bnkstmnt_lines})
 
-    #     ${reconciliation_journal_entry_lines}    Set Variable    ${reconciliation_journal_entry_lines.replace('"[', '[').replace(']"', ']')}
-    #     ${reconciliation_bank_statement_lines}    Set Variable    ${reconciliation_bank_statement_lines.replace('"[', '[').replace(']"', ']')}
+        ${reconciliation_journal_entry_lines}    Set Variable    ${reconciliation_journal_entry_lines.replace('"[', '[').replace(']"', ']')}
+        ${reconciliation_bank_statement_lines}    Set Variable    ${reconciliation_bank_statement_lines.replace('"[', '[').replace(']"', ']')}
 
-    #     ${reconciliation_journal_entry_lines}    Set Variable    ${reconciliation_journal_entry_lines.replace('"\\[', '[').replace('\\]"', ']')}
-    #     ${reconciliation_bank_statement_lines}    Set Variable    ${reconciliation_bank_statement_lines.replace('"\\[', '[').replace('\\]"', ']')}
+        ${reconciliation_journal_entry_lines}    Set Variable    ${reconciliation_journal_entry_lines.replace('"\\[', '[').replace('\\]"', ']')}
+        ${reconciliation_bank_statement_lines}    Set Variable    ${reconciliation_bank_statement_lines.replace('"\\[', '[').replace('\\]"', ']')}
 
-    #     ${payload3}    Create Dictionary        ReconciliationAccountType=${datatype}    ReconciliationBankStatementLines=${reconciliation_bank_statement_lines}    ReconciliationJournalEntryLines=${reconciliation_journal_entry_lines}
-    #     ${final_payload}    Create Dictionary    ExternalReconciliation=${payload3}
+        ${payload3}    Create Dictionary        ReconciliationAccountType=${datatype}    ReconciliationBankStatementLines=${reconciliation_bank_statement_lines}    ReconciliationJournalEntryLines=${reconciliation_journal_entry_lines}
+        ${final_payload}    Create Dictionary    ExternalReconciliation=${payload3}
 
-    #     ${final_payload_string}    Evaluate    json.dumps(${final_payload})
+        ${final_payload_string}    Evaluate    json.dumps(${final_payload})
 
-    #     ${final_payload_string}    Set Variable    ${final_payload_string.replace('\\', '')}
-    #     ${final_payload_string}    Set Variable    ${final_payload_string.replace('"[', '[').replace(']"', ']')}
+        ${final_payload_string}    Set Variable    ${final_payload_string.replace('\\', '')}
+        ${final_payload_string}    Set Variable    ${final_payload_string.replace('"[', '[').replace(']"', ']')}
 
-    #     ${final_payload_string}    Set Variable    ${final_payload_string.replace('"\\[', '[').replace('\\]"', ']')}
+        ${final_payload_string}    Set Variable    ${final_payload_string.replace('"\\[', '[').replace('\\]"', ']')}
 
-    #     Log To Console  \nFinal Body ExterNal ReconciliationService:\n ${final_payload_string}
+        Log To Console  \nFinal Body ExterNal ReconciliationService:\n ${final_payload_string}
 
-    #     ${responseFinal}=  Post Request  ${sessionname}    ${base_url}/ExternalReconciliationsService_Reconcile  data=${final_payload_string}  headers=${headers}
-    #     IF    ${responseFinal.status_code} == 204
-    #         Log To Console      \nSuccess All
-    #         Open Workbook    ${url}
-    #         Set Active Worksheet    Sheet1
-    #         Set Styles    G6:G9
-    #         ...  color=ffffff
-    #         ...  align_horizontal=center
-    #         ...  align_vertical=center
-    #         ...  bold=True
-    #         ...  cell_fill=198754
-    #         Set Cell Value  7   7     ${success_msg}
-    #         Save Workbook
-    #         Log To Console    \nReconciliation Success 
-    #     ELSE
-    #         ${ErrorMsg}     Set Variable    ${response.json()['error']['message']['value']}
-    #         Open Workbook    ${url}
-    #         Set Active Worksheet    Sheet1
-    #         Set Styles    G6:G9
-    #         ...  color=ffffff
-    #         ...  align_horizontal=center
-    #         ...  align_vertical=center
-    #         ...  bold=True
-    #         ...  cell_fill=DC143C
-    #         Set Cell Value  6   7     ${fail_msg}
-    #         Set Cell Value  7   7     Value: ${ErrorMsg}
-    #         Set Cell Format    7   7
-    #         ...   wrap_text=True
-    #         Save Workbook
-    #         Log To Console      Reconciliation Failed
-    #     END
-    # END
+        ${responseFinal}=  Post Request  ${sessionname}    ${base_url}/ExternalReconciliationsService_Reconcile  data=${final_payload_string}  headers=${headers}
+        IF    ${responseFinal.status_code} == 204
+            Log To Console      \nSuccess All
+            Open Workbook    ${url}
+            Set Active Worksheet    Sheet1
+            Set Styles    G6:G9
+            ...  color=ffffff
+            ...  align_horizontal=center
+            ...  align_vertical=center
+            ...  bold=True
+            ...  cell_fill=198754
+            Set Cell Value  7   7     ${success_msg}
+            Save Workbook
+            Log To Console    \nReconciliation Success 
+        ELSE
+            ${ErrorMsg}     Set Variable    ${response.json()['error']['message']['value']}
+            Open Workbook    ${url}
+            Set Active Worksheet    Sheet1
+            Set Styles    G6:G9
+            ...  color=ffffff
+            ...  align_horizontal=center
+            ...  align_vertical=center
+            ...  bold=True
+            ...  cell_fill=DC143C
+            Set Cell Value  6   7     ${fail_msg}
+            Set Cell Value  7   7     Value: ${ErrorMsg}
+            Set Cell Format    7   7
+            ...   wrap_text=True
+            Save Workbook
+            Log To Console      Reconciliation Failed
+        END
+    END
