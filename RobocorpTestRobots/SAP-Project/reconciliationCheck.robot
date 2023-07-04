@@ -258,7 +258,7 @@ second page
             ${journal_debit}    Set Variable    ${journal_transaction_details_list[${journal_record}]}[Debit]
             ${journal_LineId}    Set Variable    ${journal_transaction_details_list[${journal_record}]}[LineID]
             ${journal_date}    Set Variable    ${journal_transaction_details_list[${journal_record}]}[jrLineDates] 
-            # IF     
+                
             IF      '${excel_credit}' == '${journal_credit}'
                 IF  '${excel_credit}' != '0.0'   
                     IF  '${excel_date}' == '${journal_date}'
@@ -281,9 +281,31 @@ second page
     Log To Console          \nMatched::::::: ${matching_records}
     Log To Console          \nUnMatched::::::: ${unmatched_records} 
 
+    ${JL}    Create List    1    2    3    4    5
+    ${EX}    Create List    1    2    6    7
+    ${UnMatched}    Create List
+    ${Matched}    Create List
+
+    FOR    ${element}    IN    @{EX}
+        ${is_matched}    Set Variable    ${False}
+        FOR    ${j_element}    IN    @{JL}
+            Run Keyword If    '${element}' == '${j_element}'
+                ${is_matched}    Set Variable    ${True}
+                Exit For Loop
+            END
+        END
+        Run Keyword If    not ${is_matched}
+            Append To List    ${UnMatched}    ${element}
+        ...    ELSE
+            Append To List    ${Matched}    ${element}
+        END
+    END
+    Log To Console \nUnMatched::::::: ${UnMatched}
+    Log To Console \nMatched::::::: ${Matched}
 
 
 
+    
 
 
 
