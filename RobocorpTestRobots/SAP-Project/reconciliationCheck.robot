@@ -262,7 +262,7 @@ second page
                 ${journal_LineId}    Set Variable    ${journal_record}[LineID]
                 ${journal_date}    Set Variable    ${journal_record}[jrLineDates]
                 IF    '${excel_credit}' == '${journal_credit}' 
-                    IF      '${excel_credit}' != '0.0' 
+                    IF      '${excel_credit}' != '0.0'  
                         IF      '${excel_date}' == '${journal_date}'
                             ${matching_record}    Set Variable    ${journal_record}
                             ${trans_id}    Set Variable    ${matching_record}[TransID]
