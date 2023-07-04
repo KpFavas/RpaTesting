@@ -411,6 +411,7 @@ second page
     Log To Console      \nMatched records
     Log To Console      Final Matched UnRec Trans_IdList\t:${TransIDsMatchedList}
     ${Matched_UnRec_TransIds_Length}    Evaluate    len(${TransIDsMatchedList})
+    Log To Console      \nMatched records
     Log To Console      Final Matched UnRec LineIdList\t:${LineIdsMatchedList}
     Log To Console      Final Matched UnRec CreditsList\t:${CreditMatchedList}
     Log To Console      Final Matched UnRec DebitsList\t:${DebitMatchedList}
@@ -535,9 +536,9 @@ second page
             Log to Console    \n\nbnkstmnt_line: ${bnkstmnt_line}
         END
 
-        FOR     ${TrCount}      IN RANGE    0     ${Matched_UnRec_TransIds_Length}
+        FOR     ${TrCount}      IN RANGE       ${Matched_UnRec_TransIds_Length}
             # matched_Ids_Un_rec
-            ${reconciliation_line}    Create Dictionary    LineNumber=${LineIdsMatchedList}[${TrCount}]    TransactionNumber=${matched_Ids_Un_rec}[${TrCount}]
+            ${reconciliation_line}    Create Dictionary    LineNumber=${LineIdsMatchedList}[${TrCount}]    TransactionNumber=${TransIDsMatchedList}[${TrCount}]
             Append To List    ${reconciliation_lines}    ${reconciliation_line}
             Log to Console    \n\nReconciliation_line: ${reconciliation_line}
         END
@@ -597,6 +598,6 @@ second page
             Set Cell Format    7   7
             ...   wrap_text=True
             Save Workbook
-            Log To Console      Reconciliation Failed
+            Log To Console      Reconciliation Failed ${responseFinal.json()['error']['message']['value']}
         END
     END 
