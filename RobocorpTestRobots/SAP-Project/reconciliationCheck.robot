@@ -573,7 +573,7 @@ second page
         IF    ${responseFinal.status_code} == 204
             Log To Console      \nSuccess All
             Open Workbook    ${url}
-            Set Active Worksheet    Sheet1
+            Set Active Worksheet    Sheet1 
             Set Styles    G6:G9
             ...  color=ffffff
             ...  align_horizontal=center
