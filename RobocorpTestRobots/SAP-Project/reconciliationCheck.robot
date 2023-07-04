@@ -423,6 +423,7 @@ second page
 
     Log To Console      \nMatched records
     Log To Console      Final Matched UnRec Trans_IdList\t:${TransIDsMatchedList}
+    ${Matched_UnRec_TransIds_Length}    Evaluate    len(${TransIDsMatchedList})
     Log To Console      Final Matched UnRec LineIdList\t:${LineIdsMatchedList}
     Log To Console      Final Matched UnRec CreditsList\t:${CreditMatchedList}
     Log To Console      Final Matched UnRec DebitsList\t:${DebitMatchedList}
@@ -440,9 +441,10 @@ second page
     Log To Console      \nSum::::::::::${DebitSum}
 
     ###############----------BankPage POST----------###############
+    Log To Console      \nChecking:::::::::TransIDLEngthMatchedCount:${Matched_UnRec_TransIds_Length}
     Log To Console      \nChecking:::::::::TransIDLEngthMatched:${unRec_TransIdlenth}
     Log To Console      \nChecking:::::::::New UnMatchedLEngth:${New_Unmatched_Len}
-    ${total_recs_toReconcile}       Set Variable        ${unRec_TransIdlenth+${New_Unmatched_Len}}
+    ${total_recs_toReconcile}       Set Variable        ${Matched_UnRec_TransIds_Length+${New_Unmatched_Len}}
     Log To Console      \nTotal Records To Reconcile: ${total_recs_toReconcile}
     IF  ${total_recs_toReconcile}>0
         FOR     ${counter}  IN RANGE    0   ${total_recs_toReconcile}
