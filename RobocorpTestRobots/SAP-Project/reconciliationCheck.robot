@@ -260,9 +260,6 @@ second page
             Log To Console      ::::::journal_date:${journal_date}     
         END
 
-
-
-
     END
 
 
