@@ -242,7 +242,7 @@ second page
     #         END
     #     END
     # END
-    FOR    ${excel_record}    IN    @{Excel_transaction_details_list}
+    FOR    ${excelRec}    IN RANGE    ${Excel_transaction_details_list_length}
         #Getting Each Row From Excel
         ${excel_credit}    Set Variable    ${Excel_transaction_details_list}[${excelRec}][Credit]
         ${excel_debit}    Set Variable    ${Excel_transaction_details_list}[${excelRec}][Debit]
@@ -259,7 +259,6 @@ second page
             Log To Console      ::::::journal_LineId:${journal_LineId}     
             Log To Console      ::::::journal_date:${journal_date}     
         END
-
     END
 
 
