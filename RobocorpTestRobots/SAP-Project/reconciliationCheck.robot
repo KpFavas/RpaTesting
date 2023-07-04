@@ -448,8 +448,8 @@ second page
     Log To Console      \nTotal Records To Reconcile: ${total_recs_toReconcile}
     IF  ${total_recs_toReconcile}>0
         FOR     ${counter}  IN RANGE    0   ${total_recs_toReconcile}
-            IF      ${unRec_TransIdlenth}>0
-                IF  ${counter} < ${unRec_TransIdlenth}
+            IF      ${Matched_UnRec_TransIds_Length}>0
+                IF  ${counter} < ${Matched_UnRec_TransIds_Length}
                     IF    '${DebitMatchedList}[${counter}]' == '0.0'
                         ${Ref_No}    Set Variable    ${referenceMatchedList}[${counter}]
                         IF      '${Ref_No}' == '0'
