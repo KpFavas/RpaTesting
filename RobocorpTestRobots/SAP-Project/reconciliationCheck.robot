@@ -259,7 +259,7 @@ second page
             ${journal_LineId}    Set Variable    ${journal_transaction_details_list[${journal_record}]}[LineID]
             ${journal_date}    Set Variable    ${journal_transaction_details_list[${journal_record}]}[jrLineDates] 
             # IF     
-            Run Keyword If    '${excel_credit}' == '${journal_credit}' and '${excel_credit}' != '0.0' and '${excel_date}' == '${journal_date}'
+            Run Keyword If    '${excel_credit}' == '${journal_credit}'  and     '${excel_credit}' != '0.0'  and  '${excel_date}' == '${journal_date}'
                 ${matching_record}      Set Variable    ${journal_transaction_details_list[${journal_record}]}
                 ${trans_id}    Set Variable    ${matching_record}[TransID]
                 ${matching_dict}    Create Dictionary    TransID=${trans_id}    Debit=${excel_debit}    Credit=${excel_credit}      Details=${excel_details}           Date=${excel_date}       Reference=${excel_reference}        Line_ID=${journal_LineId}
