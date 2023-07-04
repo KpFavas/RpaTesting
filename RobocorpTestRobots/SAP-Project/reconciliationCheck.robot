@@ -209,44 +209,80 @@ second page
     ${matching_records}    Create List 
     ${unmatched_records}    Create List
     # FOR    ${excel_record}    IN    @{Excel_transaction_details_list}
-    FOR     ${excelRec}     IN RANGE    ${Excel_transaction_details_list_length}
+    # FOR     ${excelRec}     IN RANGE    ${Excel_transaction_details_list_length}
+    #     ${excel_credit}    Set Variable    ${Excel_transaction_details_list}[${excelRec}][Credit]
+    #     ${excel_debit}    Set Variable    ${Excel_transaction_details_list}[${excelRec}][Debit]
+    #     ${excel_date}    Set Variable    ${Excel_transaction_details_list}[${excelRec}][Date]
+    #     ${excel_details}    Set Variable    ${Excel_transaction_details_list}[${excelRec}][Details]
+    #     ${excel_reference}    Set Variable    ${Excel_transaction_details_list}[${excelRec}][RefNo]
+    #     ${matching_record}    Set Variable    ${None}
+    #     ${unmatched_record}    Set Variable    ${None}
+    #     Log To Console          Matching Record Value ::::${matching_record}  
+    #     FOR    ${journal_record}    IN    @{journal_transaction_details_list}
+    #         ${journal_credit}    Set Variable    ${journal_record}[Credit]
+    #         ${journal_debit}    Set Variable    ${journal_record}[Debit]
+    #         ${journal_LineId}    Set Variable    ${journal_record}[LineID]
+    #         ${journal_date}    Set Variable    ${journal_record}[jrLineDates]
+    #         IF      '${excel_credit}' == '${journal_credit}'
+    #             IF      '${excel_credit}' != '0.0'
+    #                 IF      '${excel_date}' == '${journal_date}'
+    #                     ${matching_record}      Set Variable    ${journal_record}
+    #                     ${trans_id}    Set Variable    ${matching_record}[TransID]
+    #                     ${matching_dict}    Create Dictionary    TransID=${trans_id}    Debit=${excel_debit}    Credit=${excel_credit}      Details=${excel_details}           Date=${excel_date}       Reference=${excel_reference}        Line_ID=${journal_LineId}
+    #                     Append To List    ${matching_records}    ${matching_dict}
+    #                 END
+    #             END
+    #         ELSE
+    #             IF      '${excel_debit}' != '0.0'
+    #                     ${unmatched_record}      Set Variable    ${Excel_transaction_details_list[${excelRec}]}
+    #                     ${un_trans_id}    Set Variable    ${unmatched_record}[TransID]
+    #                     ${unmatching_dict}    Create Dictionary    TransID=${un_trans_id}    Debit=${excel_debit}    Credit=${excel_credit}    Details=${excel_details}     Date=${excel_date}      Reference=${excel_reference}
+    #                     Append To List    ${unmatched_records}    ${unmatching_dict}
+    #             END
+    #         END
+    #     END
+    # END
+    FOR    ${excel_record}    IN    @{Excel_transaction_details_list}
+        #Getting Each Row From Excel
         ${excel_credit}    Set Variable    ${Excel_transaction_details_list}[${excelRec}][Credit]
         ${excel_debit}    Set Variable    ${Excel_transaction_details_list}[${excelRec}][Debit]
         ${excel_date}    Set Variable    ${Excel_transaction_details_list}[${excelRec}][Date]
         ${excel_details}    Set Variable    ${Excel_transaction_details_list}[${excelRec}][Details]
         ${excel_reference}    Set Variable    ${Excel_transaction_details_list}[${excelRec}][RefNo]
-        ${matching_record}    Set Variable    ${None}
-        ${unmatched_record}    Set Variable    ${None}
-        # Log To Console          Matching Record Value ::::${matching_record}       
-        Log To Console      \nCheckingg:::excel_credit:${excel_credit}        
-        Log To Console      \nCheckingg:::excel_debit:${excel_debit}        
-        Log To Console      \nCheckingg:::excel_date:${excel_date}        
-        Log To Console      \nCheckingg:::excel_details:${excel_details}        
-        Log To Console      \nCheckingg:::excel_reference:${excel_reference}         
-        # FOR    ${journal_record}    IN    @{journal_transaction_details_list}
-        #     ${journal_credit}    Set Variable    ${journal_record}[Credit]
-        #     ${journal_debit}    Set Variable    ${journal_record}[Debit]
-        #     ${journal_LineId}    Set Variable    ${journal_record}[LineID]
-        #     ${journal_date}    Set Variable    ${journal_record}[jrLineDates]
-        #     IF      '${excel_credit}' == '${journal_credit}'
-        #         IF      '${excel_credit}' != '0.0'
-        #             IF      '${excel_date}' == '${journal_date}'
-        #                 ${matching_record}      Set Variable    ${journal_record}
-        #                 ${trans_id}    Set Variable    ${matching_record}[TransID]
-        #                 ${matching_dict}    Create Dictionary    TransID=${trans_id}    Debit=${excel_debit}    Credit=${excel_credit}      Details=${excel_details}           Date=${excel_date}       Reference=${excel_reference}        Line_ID=${journal_LineId}
-        #                 Append To List    ${matching_records}    ${matching_dict}
-        #             END
-        #         END
-        #     ELSE
-        #         IF      '${excel_debit}' != '0.0'
-        #                 ${unmatched_record}      Set Variable    ${Excel_transaction_details_list[${excelRec}]}
-        #                 ${un_trans_id}    Set Variable    ${unmatched_record}[TransID]
-        #                 ${unmatching_dict}    Create Dictionary    TransID=${un_trans_id}    Debit=${excel_debit}    Credit=${excel_credit}    Details=${excel_details}     Date=${excel_date}      Reference=${excel_reference}
-        #                 Append To List    ${unmatched_records}    ${unmatching_dict}
-        #         END
-        #     END
-        # END
+        FOR    ${journal_record}    IN    @{journal_transaction_details_list}
+            ${journal_credit}    Set Variable    ${journal_record}[Credit]
+            ${journal_debit}    Set Variable    ${journal_record}[Debit]
+            ${journal_LineId}    Set Variable    ${journal_record}[LineID]
+            ${journal_date}    Set Variable    ${journal_record}[jrLineDates] 
+            Log To Console      \n::::::journal_credit:${journal_credit}     
+            Log To Console      ::::::journal_debit:${journal_debit}     
+            Log To Console      ::::::journal_LineId:${journal_LineId}     
+            Log To Console      ::::::journal_date:${journal_date}     
+        END
+
+
+
+
     END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     # ${New_Unmatched_List}   Create List
     # ${lenMatched}   Evaluate    len(${matching_records})
     # Log To Console    \nMatching Records: ${matching_records}       #Matchig record List
