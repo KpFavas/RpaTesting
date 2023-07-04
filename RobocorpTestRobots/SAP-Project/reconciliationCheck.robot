@@ -432,7 +432,7 @@ second page
     Log To Console      \nSum::::::::::${DebitSum}
 
     ###############----------BankPage POST----------###############
-
+    Log To Console      \nChackinggggggggggggg::MatchedTransIds: ${unRec_TransIdlenth}, Unmatched:${New_Unmatched_Len}
     ${total_recs_toReconcile}       Set Variable        ${unRec_TransIdlenth+${New_Unmatched_Len}}
     Log To Console      \nTotal Records To Reconcile: ${total_recs_toReconcile}
     IF  ${total_recs_toReconcile}>0
