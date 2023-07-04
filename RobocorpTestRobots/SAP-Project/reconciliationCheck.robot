@@ -199,7 +199,7 @@ second page
         
         Append To List    ${journal_transaction_details_list}    ${transaction_details}
     END
-
+ 
     ###################### Transactions Are Matched/Not Mached########################
 
     Log To Console    \nJLinesTransaction Details List: ${journal_transaction_details_list}
