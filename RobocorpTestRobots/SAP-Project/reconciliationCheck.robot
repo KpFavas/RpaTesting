@@ -218,11 +218,11 @@ second page
         ${matching_record}    Set Variable    ${None}
         ${unmatched_record}    Set Variable    ${None}
         # Log To Console          Matching Record Value ::::${matching_record}       
-        Log To Console          \nCheckingg  :::excel_credit:${excel_credit}        
-        Log To Console          \nCheckingg  :::excel_debit:${excel_debit}        
-        Log To Console          \nCheckingg  :::excel_date:${excel_date}        
-        Log To Console          \nCheckingg  :::excel_details:${excel_details}        
-        Log To Console          \nCheckingg  :::excel_reference:${excel_reference}         
+        Log To Console      \nCheckingg:::excel_credit:${excel_credit}        
+        Log To Console      \nCheckingg:::excel_debit:${excel_debit}        
+        Log To Console      \nCheckingg:::excel_date:${excel_date}        
+        Log To Console      \nCheckingg:::excel_details:${excel_details}        
+        Log To Console      \nCheckingg:::excel_reference:${excel_reference}         
         # FOR    ${journal_record}    IN    @{journal_transaction_details_list}
         #     ${journal_credit}    Set Variable    ${journal_record}[Credit]
         #     ${journal_debit}    Set Variable    ${journal_record}[Debit]
