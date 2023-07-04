@@ -289,14 +289,14 @@ second page
     FOR    ${element}    IN    @{EX}
         ${is_matched}    Set Variable    ${False}
         FOR    ${j_element}    IN    @{JL}
-            Run Keyword If    '${element}' == '${j_element}'
+            IF    '${element}' == '${j_element}'
                 ${is_matched}    Set Variable    ${True}
                 Exit For Loop
             END
         END
-        Run Keyword If    not ${is_matched}
+        IF      not ${is_matched}
             Append To List    ${UnMatched}    ${element}
-        ...    ELSE
+        ELSE
             Append To List    ${Matched}    ${element}
         END
     END
