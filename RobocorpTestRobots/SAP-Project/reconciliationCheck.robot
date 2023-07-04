@@ -548,7 +548,7 @@ second page
             Log to Console    \n\nbnkstmnt_line: ${bnkstmnt_line}
         END
 
-        FOR     ${TrCount}      IN RANGE    0     ${unRec_TransIdlenth }
+        FOR     ${TrCount}      IN RANGE    0     ${Matched_UnRec_TransIds_Length}
             # matched_Ids_Un_rec
             ${reconciliation_line}    Create Dictionary    LineNumber=${LineIdsMatchedList}[${TrCount}]    TransactionNumber=${matched_Ids_Un_rec}[${TrCount}]
             Append To List    ${reconciliation_lines}    ${reconciliation_line}
