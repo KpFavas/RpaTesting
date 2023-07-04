@@ -246,12 +246,6 @@ second page
     Log To Console    \nMatching Records: ${matching_records}       #Matchig record List
     Log To Console    Matching Records Lenghth: ${lenMatched}
     ${lenUnMatched}   Evaluate    len(${unmatched_records})
-    Log To Console    \nUnMatching Records: ${unmatched_records}
-    
-    FOR    ${indexUnmatch}    IN RANGE      ${lenUnMatched}
-        ${New_unmatched}    Set Variable    ${unmatched_records[${indexUnmatch}]}
-        Append To List    ${unmatched_records}    ${New_unmatched}
-    END
     Log To Console      \nNew Unmatched Record: ${unmatched_records}      #Unmatched recrod List
     ${New_Unmatched_Len}   Evaluate    len(${unmatched_records})
     Log To Console    \nUnMatching Records: ${New_Unmatched_Len}
