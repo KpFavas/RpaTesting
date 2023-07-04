@@ -494,7 +494,7 @@ second page
             END
         END
     ELSE
-        Log To Console      \nNothing To reconsile........
+        Log To Console      \nNothing To reconsile.......
     END
     Log To Console      \nSequence List From BankPage : ${sequencelist}
     ${bnk_page_seq_lenth}   Evaluate    len(${sequencelist})
