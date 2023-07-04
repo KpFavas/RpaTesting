@@ -271,7 +271,7 @@ second page
                 ${trans_id}    Set Variable    ${matching_record}[TransID]
                 ${matching_dict}    Create Dictionary    TransID=${trans_id}    Debit=${excel_debit}    Credit=${excel_credit}    Details=${excel_details}    Date=${excel_date}    Reference=${excel_reference}    Line_ID=${journal_LineId}
                 Append To List    ${Matched}    ${matching_dict}
-                Exit For
+                Exit For Loop
             END
         END
 
