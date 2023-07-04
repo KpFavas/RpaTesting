@@ -244,64 +244,115 @@ second page
     #         END
     #     END
     # END
-    ${matching_records}    Create List 
     ${unmatched_records}    Create List
-    FOR    ${excelRec}    IN RANGE    ${Excel_transaction_details_list_length}
-        #Getting Each Row From Excel
-        ${excel_credit}    Set Variable    ${Excel_transaction_details_list}[${excelRec}][Credit]
-        ${excel_debit}    Set Variable    ${Excel_transaction_details_list}[${excelRec}][Debit]
-        ${excel_date}    Set Variable    ${Excel_transaction_details_list}[${excelRec}][Date]
-        ${excel_details}    Set Variable    ${Excel_transaction_details_list}[${excelRec}][Details]
-        ${excel_reference}    Set Variable    ${Excel_transaction_details_list}[${excelRec}][RefNo]
-        FOR    ${journal_record}    IN RANGE    ${journal_transaction_details_list_Length}
-            ${journal_credit}    Set Variable    ${journal_transaction_details_list[${journal_record}]}[Credit]
-            ${journal_debit}    Set Variable    ${journal_transaction_details_list[${journal_record}]}[Debit]
-            ${journal_LineId}    Set Variable    ${journal_transaction_details_list[${journal_record}]}[LineID]
-            ${journal_date}    Set Variable    ${journal_transaction_details_list[${journal_record}]}[jrLineDates] 
-                
-            IF      '${excel_credit}' == '${journal_credit}'
-                IF  '${excel_credit}' != '0.0'   
-                    IF  '${excel_date}' == '${journal_date}'
-                        ${matching_record}      Set Variable    ${journal_transaction_details_list[${journal_record}]}
-                        ${trans_id}    Set Variable    ${matching_record}[TransID]
-                        ${matching_dict}    Create Dictionary    TransID=${trans_id}    Debit=${excel_debit}    Credit=${excel_credit}      Details=${excel_details}           Date=${excel_date}       Reference=${excel_reference}        Line_ID=${journal_LineId}
-                        Append To List    ${matching_records}    ${matching_dict}
+    ${matching_records}    Create List
+    FOR    ${excel_record}    IN    @{Excel_transaction_details_list}
+        FOR    ${excelRec}    IN RANGE    ${Excel_transaction_details_list_length}
+            ${excel_credit}    Set Variable    ${Excel_transaction_details_list}[${excelRec}][Credit]
+            ${excel_debit}    Set Variable    ${Excel_transaction_details_list}[${excelRec}][Debit]
+            ${excel_date}    Set Variable    ${Excel_transaction_details_list}[${excelRec}][Date]
+            ${excel_details}    Set Variable    ${Excel_transaction_details_list}[${excelRec}][Details]
+            ${excel_reference}    Set Variable    ${Excel_transaction_details_list}[${excelRec}][RefNo]
+            ${matching_record}    Set Variable    ${None}
+            ${unmatched_record}    Set Variable    ${None}
+            Log To Console    Matching Record Value ::::${matching_record}
+            FOR    ${journal_record}    IN    @{journal_transaction_details_list}
+                ${journal_credit}    Set Variable    ${journal_record}[Credit]
+                ${journal_debit}    Set Variable    ${journal_record}[Debit]
+                ${journal_LineId}    Set Variable    ${journal_record}[LineID]
+                ${journal_date}    Set Variable    ${journal_record}[jrLineDates]
+                IF    '${excel_credit}' == '${journal_credit}' 
+                    IF      '${excel_credit}' != '0.0' 
+                        IF      '${excel_date}' == '${journal_date}'
+                            ${matching_record}    Set Variable    ${journal_record}
+                            ${trans_id}    Set Variable    ${matching_record}[TransID]
+                            ${matching_dict}    Create Dictionary    TransID=${trans_id}    Debit=${excel_debit}    Credit=${excel_credit}    Details=${excel_details}    Date=${excel_date}    Reference=${excel_reference}    Line_ID=${journal_LineId}
+                            Append To List    ${matching_records}    ${matching_dict}
+                        END
+                    END
+                ELSE 
+                    IF    '${excel_debit}' != '0.0'
+                        ${unmatched_record}    Set Variable    ${Excel_transaction_details_list[${excelRec}]}
+                        ${un_trans_id}    Set Variable    ${unmatched_record}[TransID]
+                        ${unmatching_dict}    Create Dictionary    TransID=${un_trans_id}    Debit=${excel_debit}    Credit=${excel_credit}    Details=${excel_details}    Date=${excel_date}    Reference=${excel_reference}
+                        Append To List    ${unmatched_records}    ${unmatching_dict}
                     END
                 END
-            ELSE 
-                IF    '${excel_debit}' != '0.0'
-                    ${unmatched_record}      Set Variable    ${Excel_transaction_details_list[${excelRec}]}
-                    ${un_trans_id}    Set Variable    ${unmatched_record}[TransID]
-                    ${unmatching_dict}    Create Dictionary    TransID=${un_trans_id}    Debit=${excel_debit}    Credit=${excel_credit}    Details=${excel_details}     Date=${excel_date}      Reference=${excel_reference}
-                    Append To List    ${unmatched_records}    ${unmatching_dict}
-                END
             END
         END
     END
-    Log To Console          \nMatched::::::: ${matching_records}
-    Log To Console          \nUnMatched::::::: ${unmatched_records} 
 
-    ${JL}    Create List    1    2    3    4    5
-    ${EX}    Create List    1    2    6    7
-    ${UnMatched}    Create List
-    ${Matched}    Create List 
+    
 
-    FOR    ${element}    IN    @{EX}
-        ${is_matched}    Set Variable    ${False}
-        FOR    ${j_element}    IN    @{JL}
-            IF    '${element}' == '${j_element}'
-                ${is_matched}    Set Variable    ${True}
-                Exit For Loop
-            END
-        END
-        IF      not ${is_matched}
-            Append To List    ${UnMatched}    ${element}
-        ELSE
-            Append To List    ${Matched}    ${element}
-        END
-    END
-    Log To Console      \nUnMatched::::::: ${UnMatched}
-    Log To Console      \nMatched::::::: ${Matched}
+    # FOR    ${element}    IN    @{Excel_transaction_details_list}
+    #     ${is_matched}    Set Variable    ${False}
+    #     ${excel_credit}    Set Variable    ${Excel_transaction_details_list}[${excelRec}][Credit]
+    #     ${excel_debit}    Set Variable    ${Excel_transaction_details_list}[${excelRec}][Debit]
+    #     ${excel_date}    Set Variable    ${Excel_transaction_details_list}[${excelRec}][Date]
+    #     ${excel_details}    Set Variable    ${Excel_transaction_details_list}[${excelRec}][Details]
+    #     ${excel_reference}    Set Variable    ${Excel_transaction_details_list}[${excelRec}][RefNo]
+
+    #     FOR    ${j_element}    IN    @{journal_transaction_details_list}
+    #     ${journal_credit}    Set Variable    ${journal_record}[Credit]
+    #         ${journal_debit}    Set Variable    ${journal_record}[Debit]
+    #         ${journal_LineId}    Set Variable    ${journal_record}[LineID]
+    #         ${journal_date}    Set Variable    ${journal_record}[jrLineDates]
+    #         IF    '${element}' == '${j_element}'
+    #             ${is_matched}    Set Variable    ${True}
+    #             Exit For Loop
+    #         END
+    #     END
+    #     IF      not ${is_matched}
+    #         Append To List    ${unmatched_records}    ${element}
+    #     ELSE
+    #         Append To List    ${matching_records}    ${element}
+    #     END
+    # END
+    Log To Console      \nUnMatched::::::: ${unmatched_records}
+    Log To Console      \nMatched::::::: ${matching_records}
+
+
+
+
+
+    # ${matching_records}    Create List 
+    # ${unmatched_records}    Create List
+    # FOR    ${excelRec}    IN RANGE    ${Excel_transaction_details_list_length}
+    #     #Getting Each Row From Excel
+    #     ${excel_credit}    Set Variable    ${Excel_transaction_details_list}[${excelRec}][Credit]
+    #     ${excel_debit}    Set Variable    ${Excel_transaction_details_list}[${excelRec}][Debit]
+    #     ${excel_date}    Set Variable    ${Excel_transaction_details_list}[${excelRec}][Date]
+    #     ${excel_details}    Set Variable    ${Excel_transaction_details_list}[${excelRec}][Details]
+    #     ${excel_reference}    Set Variable    ${Excel_transaction_details_list}[${excelRec}][RefNo]
+    #     FOR    ${journal_record}    IN RANGE    ${journal_transaction_details_list_Length}
+    #         ${journal_credit}    Set Variable    ${journal_transaction_details_list[${journal_record}]}[Credit]
+    #         ${journal_debit}    Set Variable    ${journal_transaction_details_list[${journal_record}]}[Debit]
+    #         ${journal_LineId}    Set Variable    ${journal_transaction_details_list[${journal_record}]}[LineID]
+    #         ${journal_date}    Set Variable    ${journal_transaction_details_list[${journal_record}]}[jrLineDates] 
+                
+    #         IF      '${excel_credit}' == '${journal_credit}'
+    #             IF  '${excel_credit}' != '0.0'   
+    #                 IF  '${excel_date}' == '${journal_date}'
+    #                     ${matching_record}      Set Variable    ${journal_transaction_details_list[${journal_record}]}
+    #                     ${trans_id}    Set Variable    ${matching_record}[TransID]
+    #                     ${matching_dict}    Create Dictionary    TransID=${trans_id}    Debit=${excel_debit}    Credit=${excel_credit}      Details=${excel_details}           Date=${excel_date}       Reference=${excel_reference}        Line_ID=${journal_LineId}
+    #                     Append To List    ${matching_records}    ${matching_dict}
+    #                 END
+    #             END
+    #         ELSE 
+    #             IF    '${excel_debit}' != '0.0'
+    #                 ${unmatched_record}      Set Variable    ${Excel_transaction_details_list[${excelRec}]}
+    #                 ${un_trans_id}    Set Variable    ${unmatched_record}[TransID]
+    #                 ${unmatching_dict}    Create Dictionary    TransID=${un_trans_id}    Debit=${excel_debit}    Credit=${excel_credit}    Details=${excel_details}     Date=${excel_date}      Reference=${excel_reference}
+    #                 Append To List    ${unmatched_records}    ${unmatching_dict}
+    #             END
+    #         END
+    #     END
+    # END
+    # Log To Console          \nMatched::::::: ${matching_records}
+    # Log To Console          \nUnMatched::::::: ${unmatched_records} 
+
+    
 
 
 
