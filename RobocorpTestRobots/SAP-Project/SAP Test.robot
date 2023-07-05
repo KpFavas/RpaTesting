@@ -60,7 +60,6 @@ Json Validation
     Log To Console      \nExcel Row Lenth : ${Excel_Length}
     #-------------------------------------------------
     
-
     # getting banktransaction details
     ${customer_response}    Get Request    ${sessionname}    ${base_url}/JournalEntries?$filter=DueDate ge '${From_Date}' and DueDate le '${To_Date}'
     IF    ${customer_response.status_code} == 200
@@ -134,25 +133,36 @@ Json Validation
     ${unmatched_records}    Create List
     ${matching_records}    Create List
     FOR    ${excel_record}    IN    @{Excel_transaction_details_list}
-        ${excel_credit1}    Convert To Number    ${excel_record}[CreditAmount]
-        ${excel_credit1}    Evaluate    "{:.2f}".format(${excel_credit1})
-        ${excel_credit}    Convert To String    ${excel_credit1}
-        ${excel_debit1}    Set Variable    ${excel_record}[DebitAmount]
-        ${excel_debit1}    Convert To Number    ${excel_debit1}
-        ${excel_debit1}    Evaluate    "{:.2f}".format(${excel_debit1})
-        ${excel_debit}    Convert To String    ${excel_debit1}
-        ${excel_date1}    Set Variable    ${excel_record}[DueDate]
-        ${excel_date}    Convert Date    ${excel_date1}    date_format=%Y%m%d    result_format=%Y-%m-%dT%H:%M:%SZ
+        ${excel_credit}     Set Variable    ${excel_record}[CreditAmount]
+        IF    '${excel_credit}' != '' and '${excel_credit}'.isdecimal()
+            ${excel_credit}     Convert To Number    ${excel_credit}
+            ${excel_credit}     Evaluate    "{:.2f}".format(${excel_credit})
+        ELSE
+            ${excel_credit}      Set Variable    '0.00'
+            Log To Console      \nError ${excel_credit}
+        END
+        ${excel_debit}      Set Variable    ${excel_record}[DebitAmount]
+        IF    '${excel_debit}' != '' and '${excel_debit}'.isdecimal()
+            ${excel_debit}     Convert To Number    ${excel_debit}
+            ${excel_debit}     Evaluate    "{:.2f}".format(${excel_debit})
+        ELSE
+            ${excel_debit}      Set Variable    0.00
+            Log To Console      \nError ${excel_debit}
+        END
+        ${excel_debi}       Convert To Number    ${excel_debit}
+        ${excel_debit}      Evaluate    "{:.2f}".format(${excel_debit})
+        ${excel_date1}      Set Variable    ${excel_record}[DueDate]
+        ${excel_date}       Convert Date    ${excel_date1}    date_format=%Y%m%d    result_format=%Y-%m-%dT%H:%M:%SZ
         Log To Console      Date: ${excel_date}
         ${excel_details}    Set Variable    ${excel_record}[Memo]
-        ${excel_reference}    Set Variable    ${excel_record}[Reference]
+        ${excel_reference}      Set Variable    ${excel_record}[Reference]
         ${is_matched}    Set Variable    ${False}
         FOR    ${journal_record}    IN    @{journal_transaction_details_list}
             ${journal_credit}    Set Variable    ${journal_record}[Credit]
-            ${journal_credit}    Convert To Number    ${journal_credit}
+            ${journal_credit}=    Convert To Number    ${journal_credit}
             ${journal_credit}    Evaluate    "{:.2f}".format(${journal_credit})
             ${journal_debit}    Set Variable    ${journal_record}[Debit]
-            ${journal_debit}    Convert To Number    ${journal_debit}
+            ${journal_debit}=    Convert To Number    ${journal_debit}
             ${journal_debit}    Evaluate    "{:.2f}".format(${journal_debit})
             ${journal_LineId}    Set Variable    ${journal_record}[LineID]
             ${journal_date}    Set Variable    ${journal_record}[jrLineDates]
