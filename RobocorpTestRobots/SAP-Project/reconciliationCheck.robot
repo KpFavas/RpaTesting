@@ -507,7 +507,7 @@ second page
             Append To List      ${JdtNumbsList}     ${JdtNumberss}
             Log To Console    \nSuccessjournalentry
         ELSE
-            Log To Console    \nFailjournalentry
+            Log To Console    \nFailjournalentry ${responseJEntry.json()}
         END
     END
 
@@ -525,7 +525,7 @@ second page
 
     # ##############----------POST External Reconciliation----------###############
 
-    IF      ${bnk_page_seq_lenth} > 0
+    IF      ${bnk_page_seq_lenth} > 0 and ${JEntrypostResponseBody}
         #######====================================
         Log To Console      \nSequenceList: ${sequencelist}
         ${reconciliation_lines}    Create List
