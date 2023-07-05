@@ -592,7 +592,7 @@ second page
             ...  align_horizontal=center
             ...  align_vertical=center
             ...  bold=True
-            ...  cell_fill=DC143C
+            ...  cell_fill=DC143C 
             Set Cell Value  6   7     ${fail_msg}
             Set Cell Value  7   7     Value: ${ErrorMsg}
             Set Cell Format    7   7
