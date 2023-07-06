@@ -585,3 +585,14 @@ Json Validation
     #         Log To Console      Reconciliation Failed ${responseFinal.json()['error']['message']['value']}
     #     END
     # END 
+    *** Settings ***
+Library    OperatingSystem
+Library    Collections
+Library    JSONLibrary
+*** Variables ***
+${final_response_string}        {"message":"Hi"}
+*** Tasks ***
+Example Test
+    ${final_response}    Create Dictionary    KeyY1=Value1    Key2=Value2
+    ${final_response_string}    Evaluate    json.dumps(${final_response})
+    Create File    final_response.json    ${final_response_string}
