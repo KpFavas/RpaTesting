@@ -525,7 +525,7 @@ second page
 
     # ##############----------POST External Reconciliation----------###############
 
-    IF      ${bnk_page_seq_lenth} > 0 and ${JEntrypostResponseBody}
+    IF      ${bnk_page_seq_lenth} > 0
         #######====================================
         Log To Console      \nSequenceList: ${sequencelist}
         ${reconciliation_lines}    Create List
