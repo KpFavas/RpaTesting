@@ -337,7 +337,7 @@ second page
         ${matchdr}     Set Variable    ${DebitsMatched['Debit']}
         Append To List      ${DebitMatchedList}     ${matchdr}
     END
-
+ 
     #===========================Details
 
     FOR     ${detailsMatched}    IN      @{matching_records} 
