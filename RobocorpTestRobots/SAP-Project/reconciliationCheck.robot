@@ -594,5 +594,7 @@ second page
             Save Workbook
             Log To Console      Reconciliation Failed ${responseFinal.json()['error']['message']['value']}
         END
+    ELSE
+        Log To Console      \n No records To Reconcile....
     END 
 
