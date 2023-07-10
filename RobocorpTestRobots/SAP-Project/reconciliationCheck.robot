@@ -490,7 +490,7 @@ second page
     ${JdtNumbsList}     Create List
     # ${JlinesTransNumbersList}     Create List
     ${JlinesList}     Create List
-    IF      ${New_Unmatched_Len} > 0
+    IF      ${New_Unmatched_Len} > 0 and ${unRec_TransIdlenth}>0
         ${PAYLOAD2}    Set Variable         {"JournalEntryLines": [{"AccountCode": "${rev_bank}","Credit": ${DebitSum},"Debit": 0.0,"BPLID": 1},{"AccountCode": "${bank_charge_paid}","Credit": 0.0,"Debit": ${DebitSum},"BPLID": 1}]}
         Log To Console      \nPOST PayloadJlines: ${PAYLOAD2}
         ${responseJEntry}=  Post Request  ${sessionname}    ${base_url}/JournalEntries  data=${PAYLOAD2}  headers=${headers}
