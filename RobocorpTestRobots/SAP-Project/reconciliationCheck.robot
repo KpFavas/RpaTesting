@@ -181,7 +181,7 @@ second page
     Log To Console      \n LengthFinal: ${Dic_length}
     
 ######################### ^^^^Journal Entry Filtered^^^^ ########################
-
+    #add if jl lenghth>0
     ${journal_transaction_details_list}    Create List
     FOR    ${index}    IN RANGE    ${Dic_length}
         ${trans_id_tr}    Set Variable    ${Trans_Ids[${index}]}
@@ -199,15 +199,13 @@ second page
         
         Append To List    ${journal_transaction_details_list}    ${transaction_details}
     END
- 
-    ###################### Transactions Are Matched/Not Mached########################
-
     Log To Console    \nJLinesTransaction Details List: ${journal_transaction_details_list}
     ${journal_transaction_details_list_Length}    Evaluate    len(${journal_transaction_details_list})
     Log To Console      \nJE_transaction_details_list Length:${journal_transaction_details_list_Length}
     Log To Console    \nExcelTransaction Details List: ${Excel_transaction_details_list}
     ${Excel_transaction_details_list_length}    Evaluate    len(${Excel_transaction_details_list})
     Log To Console      \nExcel_transaction_details_list Length:${Excel_transaction_details_list_length}
+    ###################### Transactions Are Matched/Not Mached########################
     ${unmatched_records}    Create List
     ${matching_records}    Create List
     FOR    ${excel_record}    IN    @{Excel_transaction_details_list}
@@ -239,7 +237,6 @@ second page
     Log To Console      \nMatched::::::: ${matching_records}
 
     #------------------
-
     # ${New_Unmatched_List}   Create List
     ${lenMatched}   Evaluate    len(${matching_records})
     Log To Console    \nMatching Records: ${matching_records}       #Matchig record List
@@ -248,7 +245,6 @@ second page
     Log To Console      \nNew Unmatched Record: ${unmatched_records}      #Unmatched recrod List
     ${New_Unmatched_Len}   Evaluate    len(${unmatched_records})
     Log To Console    \nUnMatching Records: ${New_Unmatched_Len}
-
     #####--- POST to Get The Reconciliation List --- #####
     ${matched_Ids_Un_rec}  Create List
     IF      ${lenMatched} > 0
@@ -434,7 +430,7 @@ second page
     Log To Console      \nChecking:::::::::New UnMatchedLEngth:${New_Unmatched_Len}
     ${total_recs_toReconcile}       Set Variable        ${Matched_UnRec_TransIds_Length+${New_Unmatched_Len}}
     Log To Console      \nTotal Records To Reconcile: ${total_recs_toReconcile}
-    IF  ${total_recs_toReconcile}>0 and ${Matched_UnRec_TransIds_Length}>0
+    IF  ${total_recs_toReconcile}>0 and ${matched_Ids_Un_rec}>0
         FOR     ${counter}  IN RANGE    0   ${total_recs_toReconcile}
             IF      ${Matched_UnRec_TransIds_Length}>0
                 IF  ${counter} < ${Matched_UnRec_TransIds_Length}
