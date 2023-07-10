@@ -430,7 +430,7 @@ second page
     Log To Console      \nChecking:::::::::New UnMatchedLEngth:${New_Unmatched_Len}
     ${total_recs_toReconcile}       Set Variable        ${Matched_UnRec_TransIds_Length+${New_Unmatched_Len}}
     Log To Console      \nTotal Records To Reconcile: ${total_recs_toReconcile}
-    IF  ${total_recs_toReconcile}>0 and ${matched_Ids_Un_rec}>0
+    IF  ${total_recs_toReconcile}>0 and ${unRec_TransIdlenth}>0
         FOR     ${counter}  IN RANGE    0   ${total_recs_toReconcile}
             IF      ${Matched_UnRec_TransIds_Length}>0
                 IF  ${counter} < ${Matched_UnRec_TransIds_Length}
