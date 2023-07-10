@@ -485,7 +485,7 @@ second page
     ${bnk_page_seq_lenth}   Evaluate    len(${sequencelist})
     Log To Console      \nSequence List From BankPage Length : ${bnk_page_seq_lenth}
     Log To Console      \nUnMatched Length: ${New_Unmatched_Len}
-    ##############----------POST & GET Journal Entry Lines----------###############
+    #POST & GET Journal Entry Lines
     ${JdtNumbsList}     Create List
     # ${JlinesTransNumbersList}     Create List
     ${JlinesList}     Create List
